@@ -29,7 +29,7 @@ const products = [
     name: "Village Chickens",
     emoji: "🐔",
     image: chickensImage,
-    description: "Traditional village-raised chickens with authentic flavor and texture. K120 per whole chicken.",
+    description: "Traditional village-raised chickens with authentic flavor and texture. K150 per whole chicken.",
   },
   {
     name: "Pork Chops",

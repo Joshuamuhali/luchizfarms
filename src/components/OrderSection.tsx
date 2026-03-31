@@ -38,7 +38,7 @@ const meatItems: OrderItem[] = [
   { name: "Goat Offals", price: 70, unit: "kg", emoji: "🐐" },
   { name: "Pork Trotters", price: 70, unit: "kg", emoji: "🐷" },
   { name: "Cow Trotters", price: null, unit: "piece", emoji: "🐄", note: "Price varies by size" },
-  { name: "Village Chicken", price: 120, unit: "whole", emoji: "🐔" },
+  { name: "Village Chicken", price: 150, unit: "whole", emoji: "🐔" },
   { name: "Broiler Chicken", price: 150, unit: "whole", emoji: "🐓" },
 ];
 
