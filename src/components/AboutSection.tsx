@@ -1,4 +1,4 @@
-import logoImage from "/src/assets/main.png";
+const logoImage = new URL("/src/assets/main.png", import.meta.url).href;
 import { MapPin, Home, Flag } from "lucide-react";
 
 const AboutSection = () => {

@@ -4,130 +4,133 @@ import { Camera, Heart, Sprout, TreePine, Sun, Wind, Droplets, Wheat } from "luc
 const FarmGallerySection = () => {
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
 
+  // Helper function to get image paths
+  const getImagePath = (filename: string) => new URL(`/src/assets/farm-photos/${filename}`, import.meta.url).href;
+
   // Use ALL the farm photos from 3u Export Photos
   const galleryImages = [
     {
       id: 1,
-      src: "/src/assets/farm-photos/Chibwabwa.JPG",
+      src: getImagePath("Chibwabwa.JPG"),
       alt: "Fresh Chibwabwa vegetables from our farm",
       category: "Vegetables",
       icon: Sprout
     },
     {
       id: 2,
-      src: "/src/assets/farm-photos/ChineseCabbage.JPG",
+      src: getImagePath("ChineseCabbage.JPG"),
       alt: "Chinese Cabbage grown in our fertile soil",
       category: "Vegetables",
       icon: Sprout
     },
     {
       id: 3,
-      src: "/src/assets/farm-photos/cabbage.JPG",
+      src: getImagePath("cabbage.JPG"),
       alt: "Fresh cabbage harvested from our fields",
       category: "Vegetables",
       icon: Sprout
     },
     {
       id: 4,
-      src: "/src/assets/farm-photos/Lumanda.JPG",
+      src: getImagePath("Lumanda.JPG"),
       alt: "Lumanda leaves ready for harvest",
       category: "Vegetables",
       icon: Sprout
     },
     {
       id: 5,
-      src: "/src/assets/farm-photos/Okra.JPG",
+      src: getImagePath("Okra.JPG"),
       alt: "Fresh Okra pods from our garden",
       category: "Vegetables",
       icon: Sprout
     },
     {
       id: 6,
-      src: "/src/assets/farm-photos/Onions.JPG",
+      src: getImagePath("Onions.JPG"),
       alt: "Onions cultivated at Luchiz Farm",
       category: "Vegetables",
       icon: Sprout
     },
     {
       id: 7,
-      src: "/src/assets/farm-photos/Tomatoes.JPG",
+      src: getImagePath("Tomatoes.JPG"),
       alt: "Ripe tomatoes from our farm",
       category: "Vegetables",
       icon: Sprout
     },
     {
       id: 8,
-      src: "/src/assets/farm-photos/pepper.JPG",
+      src: getImagePath("pepper.JPG"),
       alt: "Colorful peppers grown on our farm",
       category: "Vegetables",
       icon: Sprout
     },
     {
       id: 9,
-      src: "/src/assets/farm-photos/Pork Chops.JPG",
+      src: getImagePath("Pork Chops.JPG"),
       alt: "Quality pork products from our livestock",
       category: "Meat",
       icon: Heart
     },
     {
       id: 10,
-      src: "/src/assets/farm-photos/Goat Meat.JPG",
+      src: getImagePath("Goat Meat.JPG"),
       alt: "Fresh goat meat from our farm",
       category: "Meat",
       icon: Heart
     },
     {
       id: 11,
-      src: "/src/assets/farm-photos/IMG_3844.JPG",
+      src: getImagePath("IMG_3844.JPG"),
       alt: "Farm operations at Luchiz Farm",
       category: "Farm Life",
       icon: TreePine
     },
     {
       id: 12,
-      src: "/src/assets/farm-photos/IMG_3849.JPG",
+      src: getImagePath("IMG_3849.JPG"),
       alt: "Daily activities on our farm",
       category: "Farm Life",
       icon: TreePine
     },
     {
       id: 13,
-      src: "/src/assets/farm-photos/IMG_3852.JPG",
+      src: getImagePath("IMG_3852.JPG"),
       alt: "Scenes from Luchiz Farm",
       category: "Farm Life",
       icon: TreePine
     },
     {
       id: 14,
-      src: "/src/assets/farm-photos/IMG_3853.JPG",
+      src: getImagePath("IMG_3853.JPG"),
       alt: "Our farming environment",
       category: "Farm Life",
       icon: TreePine
     },
     {
       id: 15,
-      src: "/src/assets/farm-photos/IMG_3856.JPG",
+      src: getImagePath("IMG_3856.JPG"),
       alt: "Life at Luchiz Farm",
       category: "Farm Life",
       icon: TreePine
     },
     {
       id: 16,
-      src: "/src/assets/farm-photos/IMG_3867.PNG",
+      src: getImagePath("IMG_3867.PNG"),
       alt: "Beautiful farm landscape at Luchiz Farm",
       category: "Farm Life",
       icon: TreePine
     },
     {
       id: 17,
-      src: "/src/assets/farm-photos/IMG_3868.PNG",
+      src: getImagePath("IMG_3868.PNG"),
       alt: "Scenic views from our farm in Chisamba",
       category: "Farm Life",
       icon: TreePine
     },
     {
       id: 18,
-      src: "/src/assets/farm-photos/IMG_3869.JPG",
+      src: getImagePath("IMG_3869.JPG"),
       alt: "Agricultural operations at Luchiz Farm",
       category: "Farm Life",
       icon: TreePine
