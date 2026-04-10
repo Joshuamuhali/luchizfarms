@@ -17,9 +17,11 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  publicDir: 'public',
   assetsInclude: ["**/*.JPG", "**/*.jpg", "**/*.PNG", "**/*.png"],
   build: {
     assetsInlineLimit: 0,
+    copyPublicDir: false,
     rollupOptions: {
       output: {
         assetFileNames: (assetInfo) => {
