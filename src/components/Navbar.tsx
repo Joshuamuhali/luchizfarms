@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Menu, X, Wheat, Phone, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
-import logoImage from "@/assets/logo.png";
+import logoImage from "/src/assets/logo.png";
 
 const navLinks = [
   { label: "Home", href: "/" },

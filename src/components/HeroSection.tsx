@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Phone, MessageCircle, Wheat, ArrowRight, Leaf, ChevronLeft, ChevronRight } from "lucide-react";
-import heroImage from "@/assets/hero-farm.jpg";
+import heroImage from "/src/assets/hero-farm.jpg";
 
 const WHATSAPP_LINK = "https://wa.me/260979654602";
 const PHONE_NUMBER = "+260 979 654 602";

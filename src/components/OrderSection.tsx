@@ -4,26 +4,23 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { generateOrderPdf } from "@/lib/generateOrderPdf";
 
-// Use direct image paths to avoid TypeScript import issues
-const getImagePath = (filename: string) => `/src/assets/farm-photos/${filename}`;
-
-// Image paths for products
-const chibwabwaImage = getImagePath("Chibwabwa.JPG");
-const chineseCabbageImage = getImagePath("Chinese Cabbage.JPG");
-const cabbageImage = getImagePath("cabbage.JPG");
-const lumandaImage = getImagePath("Lumanda.JPG");
-const okraImage = getImagePath("Okra.JPG");
-const onionsImage = getImagePath("Onions.JPG");
-const tomatoesImage = getImagePath("Tomatoes.JPG");
-const goatMeatImage = getImagePath("Goat Meat.JPG");
-const porkChopsImage = getImagePath("Pork Chops.JPG");
-const img3844 = getImagePath("IMG_3844.JPG");
-const img3845 = getImagePath("IMG_3845.JPG");
-const img3849 = getImagePath("IMG_3849.JPG");
-const img3852 = getImagePath("IMG_3852.JPG");
-const img3853 = getImagePath("IMG_3853.JPG");
-const img3856 = getImagePath("IMG_3856.JPG");
-const pepperImage = getImagePath("pepper.JPG");
+// Import images properly for Vite build system
+import chibwabwaImage from "/src/assets/farm-photos/Chibwabwa.JPG";
+import chineseCabbageImage from "/src/assets/farm-photos/ChineseCabbage.JPG";
+import cabbageImage from "/src/assets/farm-photos/cabbage.JPG";
+import lumandaImage from "/src/assets/farm-photos/Lumanda.JPG";
+import okraImage from "/src/assets/farm-photos/Okra.JPG";
+import onionsImage from "/src/assets/farm-photos/Onions.JPG";
+import tomatoesImage from "/src/assets/farm-photos/Tomatoes.JPG";
+import goatMeatImage from "/src/assets/farm-photos/Goat Meat.JPG";
+import porkChopsImage from "/src/assets/farm-photos/Pork Chops.JPG";
+import img3844 from "/src/assets/farm-photos/IMG_3844.JPG";
+import img3845 from "/src/assets/farm-photos/IMG_3845.JPG";
+import img3849 from "/src/assets/farm-photos/IMG_3849.JPG";
+import img3852 from "/src/assets/farm-photos/IMG_3852.JPG";
+import img3853 from "/src/assets/farm-photos/IMG_3853.JPG";
+import img3856 from "/src/assets/farm-photos/IMG_3856.JPG";
+import pepperImage from "/src/assets/farm-photos/pepper.JPG";
 
 const WHATSAPP_NUMBER = "260979654602";
 
