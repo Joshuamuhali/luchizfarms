@@ -4,14 +4,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { generateOrderPdf } from "@/lib/generateOrderPdf";
 
-// Dynamic imports for LFS files with spaces in names
-const getImagePath = (filename: string) => {
-  try {
-    return require(`@/assets/farm-photos/${filename}`);
-  } catch {
-    return `/src/assets/farm-photos/${filename}`;
-  }
-};
+// Helper function to get image paths
+const getImagePath = (filename: string) => `/src/assets/farm-photos/${filename}`;
 
 const WHATSAPP_NUMBER = "260979654602";
 
