@@ -20,13 +20,14 @@ export default defineConfig(({ mode }) => ({
   publicDir: 'public',
   assetsInclude: ["**/*.JPG", "**/*.jpg", "**/*.PNG", "**/*.png"],
   build: {
+    outDir: 'dist',
     assetsInlineLimit: 0,
     copyPublicDir: false,
     rollupOptions: {
       output: {
         assetFileNames: (assetInfo) => {
           if (assetInfo.name && /\.(jpe?g|png|gif|svg|webp|ico)$/i.test(assetInfo.name)) {
-            return 'assets/images/[name]-[hash][extname]';
+            return 'assets/[name]-[hash][extname]';
           }
           return 'assets/[name]-[hash][extname]';
         },
