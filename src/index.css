@@ -166,4 +166,29 @@
   .btn-sunshine:active {
     transform: translateY(0);
   }
+
+  /* Farm color utility classes */
+  .bg-farm-soil {
+    background-color: hsl(var(--farm-soil));
+  }
+  
+  .text-farm-soil {
+    color: hsl(var(--farm-soil));
+  }
+  
+  .bg-farm-sunshine {
+    background-color: hsl(var(--farm-sunshine));
+  }
+  
+  .text-farm-sunshine {
+    color: hsl(var(--farm-sunshine));
+  }
+  
+  .bg-farm-leaf {
+    background-color: hsl(var(--farm-leaf));
+  }
+  
+  .text-farm-leaf {
+    color: hsl(var(--farm-leaf));
+  }
 }

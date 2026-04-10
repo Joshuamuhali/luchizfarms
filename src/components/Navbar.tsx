@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { Menu, X, Wheat, Phone, ShoppingCart } from "lucide-react";
+import { Link } from "react-router-dom";
 import logoImage from "@/assets/logo.png";
 
 const navLinks = [
-  { label: "Home", href: "#" },
-  { label: "About", href: "#about" },
-  { label: "Order", href: "#order" },
-  { label: "Gallery", href: "#gallery" },
-  { label: "How It Works", href: "#how-to-order" },
-  { label: "Contact", href: "#contact" },
+  { label: "Home", href: "/" },
+  { label: "About", href: "/about" },
+  { label: "Order", href: "/order" },
+  { label: "Gallery", href: "/gallery" },
+  { label: "How It Works", href: "/how-to-order" },
+  { label: "Contact", href: "/contact" },
 ];
 
 const Navbar = () => {
@@ -18,32 +19,28 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
       <div className="container mx-auto px-4 flex items-center justify-between h-20">
         {/* Logo */}
-        <a href="#" className="flex items-center gap-3 group">
-          <div className="relative">
-            <img 
-              src={logoImage} 
-              alt="Luchiz Farm logo" 
-              className="w-10 h-10 rounded-xl object-cover shadow-farm group-hover:scale-110 transition-transform"
-            />
-            <div className="absolute -top-1 -right-1 w-3 h-3 bg-farm-sunshine rounded-full border-2 border-farm-cloud"></div>
+        <Link to="/" className="flex items-center gap-3 group">
+          <img
+            src={logoImage}
+            alt="Luchiz Farm Logo"
+            className="w-12 h-12 object-contain group-hover:scale-105 transition-transform duration-300"
+          />
+          <div>
+            <h1 className="text-xl font-bold text-foreground">Luchiz Farm</h1>
+            <p className="text-xs text-muted-foreground">Fresh from Zambia</p>
           </div>
-          <div className="flex flex-col">
-            <span className="font-bold text-lg text-gray-900">Luchiz Farm</span>
-            <span className="text-xs text-gray-600 font-medium">Fresh from Zambia</span>
-          </div>
-        </a>
+        </Link>
 
         {/* Desktop Navigation */}
         <div className="hidden lg:flex items-center gap-8">
-          {navLinks.map((l) => (
-            <a 
-              key={l.label} 
-              href={l.href} 
-              className="text-foreground/80 hover:text-farm-leaf transition-all duration-300 font-medium text-sm relative group"
+          {navLinks.map((link) => (
+            <Link
+              key={link.label}
+              to={link.href}
+              className="text-foreground hover:text-farm-leaf font-medium transition-all duration-300 hover:-translate-y-0.5"
             >
-              {l.label}
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-farm-leaf group-hover:w-full transition-all duration-300"></span>
-            </a>
+              {link.label}
+            </Link>
           ))}
         </div>
 
@@ -81,14 +78,14 @@ const Navbar = () => {
         <div className="lg:hidden bg-farm-cloud/98 backdrop-blur-xl border-t border-farm-soil/10 px-4 pb-6">
           <div className="pt-6 space-y-4">
             {navLinks.map((l) => (
-              <a 
+              <Link 
                 key={l.label} 
-                href={l.href} 
+                to={l.href} 
                 onClick={() => setOpen(false)} 
                 className="block text-foreground/80 hover:text-farm-leaf transition-colors py-3 font-medium text-lg border-b border-farm-soil/5"
               >
                 {l.label}
-              </a>
+              </Link>
             ))}
             <div className="pt-4 space-y-3">
               <a
