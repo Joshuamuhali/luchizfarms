@@ -10,3 +10,9 @@
 src/assets/** filter=lfs diff=lfs merge=lfs -text
 src/assets/**/*.jpg filter=lfs diff=lfs merge=lfs -text
 src/assets/**/*.png filter=lfs diff=lfs merge=lfs -text
+src/assets/3u[[:space:]]Export[[:space:]]Photos/*.JPG filter=lfs diff=lfs merge=lfs -text
+src/assets/3u[[:space:]]Export[[:space:]]Photos/*.PNG filter=lfs diff=lfs merge=lfs -text
+src/assets/farm-photos/*.JPG filter=lfs diff=lfs merge=lfs -text
+src/assets/farm-photos/*.PNG filter=lfs diff=lfs merge=lfs -text
+src/assets/*.jpg filter=lfs diff=lfs merge=lfs -text
+src/assets/*.png filter=lfs diff=lfs merge=lfs -text
