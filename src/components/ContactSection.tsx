@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Phone, MapPin, Mail, Send } from "lucide-react";
+import { Phone, MapPin, Mail, Send, Circle, Heart, Bird, Carrot } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const ContactSection = () => {
@@ -80,10 +80,10 @@ const ContactSection = () => {
               className="w-full px-4 py-3 rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             >
               <option value="">Select Product Interest</option>
-              <option value="Pigs">🐖 Pigs</option>
-              <option value="Sheep">🐑 Sheep</option>
-              <option value="Broiler Chickens">🐓 Broiler Chickens</option>
-              <option value="Vegetables">🥦 Assorted Vegetables</option>
+              <option value="Pigs"><Circle className="w-4 h-4 inline mr-2" /> Pigs</option>
+              <option value="Sheep"><Heart className="w-4 h-4 inline mr-2" /> Sheep</option>
+              <option value="Broiler Chickens"><Bird className="w-4 h-4 inline mr-2" /> Broiler Chickens</option>
+              <option value="Vegetables"><Carrot className="w-4 h-4 inline mr-2" /> Assorted Vegetables</option>
               <option value="Multiple">Multiple Products</option>
             </select>
             <textarea

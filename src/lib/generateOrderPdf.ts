@@ -2,7 +2,7 @@ import jsPDF from "jspdf";
 
 interface CartItem {
   name: string;
-  emoji: string;
+  icon: any;
   price: number | null;
   unit: string;
   qty: number;

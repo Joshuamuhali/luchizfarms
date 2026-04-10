@@ -1,4 +1,5 @@
 import logoImage from "@/assets/luchiz-farm-logo.jpg";
+import { MapPin, Home, Flag } from "lucide-react";
 
 const AboutSection = () => {
   return (
@@ -31,15 +32,15 @@ const AboutSection = () => {
             </div>
             <div className="flex gap-6 text-sm text-muted-foreground">
               <div>
-                <span className="block text-2xl font-bold text-primary font-display">📍</span>
+                <MapPin className="w-6 h-6 text-primary font-display mb-1" />
                 Farm: Chisamba
               </div>
               <div>
-                <span className="block text-2xl font-bold text-primary font-display">🏠</span>
+                <Home className="w-6 h-6 text-primary font-display mb-1" />
                 Based in: Kabwe
               </div>
               <div>
-                <span className="block text-2xl font-bold text-primary font-display">🇿🇲</span>
+                <Flag className="w-6 h-6 text-primary font-display mb-1" />
                 Proudly Zambian
               </div>
             </div>

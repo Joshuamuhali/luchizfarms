@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ShoppingCart, MessageCircle, Plus, Minus, Trash2, FileDown } from "lucide-react";
+import { ShoppingCart, MessageCircle, Plus, Minus, Trash2, FileDown, Leaf, Beef, UtensilsCrossed, Heart, Circle, Square, Drumstick, Bird } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { generateOrderPdf } from "@/lib/generateOrderPdf";
@@ -10,36 +10,36 @@ interface OrderItem {
   name: string;
   price: number | null;
   unit: string;
-  emoji: string;
+  icon: any;
   note?: string;
 }
 
 const produceItems: OrderItem[] = [
-  { name: "Rape", price: 5, unit: "bundle", emoji: "🥬" },
-  { name: "Chibwabwa", price: 5, unit: "bundle", emoji: "🍃" },
-  { name: "Chinese Cabbage", price: 5, unit: "head", emoji: "🥬" },
-  { name: "Lumanda", price: 5, unit: "bundle", emoji: "🌿" },
-  { name: "Impwa", price: 5, unit: "bundle", emoji: "🍆" },
-  { name: "Okra", price: 5, unit: "bundle", emoji: "🫛" },
-  { name: "Onion", price: null, unit: "kg", emoji: "🧅", note: "Market price" },
-  { name: "Tomatoes", price: null, unit: "kg", emoji: "🍅", note: "Market price" },
-  { name: "Carrots", price: 10, unit: "bundle", emoji: "🥕" },
-  { name: "Green Pepper", price: 5, unit: "piece", emoji: "🫑" },
-  { name: "Red & Yellow Pepper", price: 20, unit: "piece", emoji: "🌶️" },
+  { name: "Rape", price: 5, unit: "bundle", icon: Leaf },
+  { name: "Chibwabwa", price: 5, unit: "bundle", icon: Leaf },
+  { name: "Chinese Cabbage", price: 5, unit: "head", icon: Leaf },
+  { name: "Lumanda", price: 5, unit: "bundle", icon: Leaf },
+  { name: "Impwa", price: 5, unit: "bundle", icon: Leaf },
+  { name: "Okra", price: 5, unit: "bundle", icon: Leaf },
+  { name: "Onion", price: null, unit: "kg", icon: Leaf, note: "Market price" },
+  { name: "Tomatoes", price: null, unit: "kg", icon: Leaf, note: "Market price" },
+  { name: "Carrots", price: 10, unit: "bundle", icon: Leaf },
+  { name: "Green Pepper", price: 5, unit: "piece", icon: Leaf },
+  { name: "Red & Yellow Pepper", price: 20, unit: "piece", icon: Leaf },
 ];
 
 const meatItems: OrderItem[] = [
-  { name: "Pork Chops", price: 110, unit: "kg", emoji: "🥩" },
-  { name: "Mixed Cut Beef", price: 120, unit: "kg", emoji: "🥩" },
-  { name: "Steak / Steak on Bone", price: 130, unit: "kg", emoji: "🥩" },
-  { name: "Lamb", price: 100, unit: "kg", emoji: "🍖" },
-  { name: "Goat Meat", price: 100, unit: "kg", emoji: "🐐" },
-  { name: "Beef Offals", price: 80, unit: "kg", emoji: "🥩" },
-  { name: "Goat Offals", price: 70, unit: "kg", emoji: "🐐" },
-  { name: "Pork Trotters", price: 70, unit: "kg", emoji: "🐷" },
-  { name: "Cow Trotters", price: null, unit: "piece", emoji: "🐄", note: "Price varies by size" },
-  { name: "Village Chicken", price: 150, unit: "whole", emoji: "🐔" },
-  { name: "Broiler Chicken", price: 150, unit: "whole", emoji: "🐓" },
+  { name: "Pork Chops", price: 110, unit: "kg", icon: Beef },
+  { name: "Mixed Cut Beef", price: 120, unit: "kg", icon: Beef },
+  { name: "Steak / Steak on Bone", price: 130, unit: "kg", icon: Beef },
+  { name: "Lamb", price: 100, unit: "kg", icon: UtensilsCrossed },
+  { name: "Goat Meat", price: 100, unit: "kg", icon: Heart },
+  { name: "Beef Offals", price: 80, unit: "kg", icon: Beef },
+  { name: "Goat Offals", price: 70, unit: "kg", icon: Heart },
+  { name: "Pork Trotters", price: 70, unit: "kg", icon: Circle },
+  { name: "Cow Trotters", price: null, unit: "piece", icon: Square, note: "Price varies by size" },
+  { name: "Village Chicken", price: 150, unit: "whole", icon: Drumstick },
+  { name: "Broiler Chicken", price: 150, unit: "whole", icon: Bird },
 ];
 
 const OrderSection = () => {
@@ -73,7 +73,7 @@ const OrderSection = () => {
   const buildCartItems = () =>
     cartEntries.map(([name, qty]) => {
       const item = getItem(name)!;
-      return { name, emoji: item.emoji, price: item.price, unit: item.unit, qty, note: item.note };
+      return { name, icon: item.icon, price: item.price, unit: item.unit, qty, note: item.note };
     });
 
   const downloadPdf = () => {
@@ -115,43 +115,57 @@ const OrderSection = () => {
   const clearCart = () => setCart({});
 
   const renderItems = (items: OrderItem[]) => (
-    <div className="grid gap-3">
+    <div className="grid gap-4">
       {items.map((item) => {
         const qty = cart[item.name] || 0;
         return (
           <div
             key={item.name}
-            className={`flex items-center justify-between p-4 rounded-xl border transition-all ${
+            className={`flex items-center justify-between p-6 rounded-2xl border transition-all duration-300 ${
               qty > 0
-                ? "border-primary/40 bg-primary/5 shadow-sm"
-                : "border-border bg-card"
+                ? "border-farm-leaf/50 bg-farm-leaf/5 shadow-farm scale-[1.02]"
+                : "border-farm-soil/20 bg-farm-cloud hover:bg-farm-sky/30"
             }`}
           >
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="text-xl">{item.emoji}</span>
-                <span className="font-display font-bold text-foreground">{item.name}</span>
-              </div>
-              <div className="flex items-center gap-2 mt-1">
-                {item.price ? (
-                  <span className="text-sm font-semibold text-primary">K{item.price}<span className="text-muted-foreground font-normal">/{item.unit}</span></span>
-                ) : (
-                  <span className="text-sm text-secondary font-medium italic">{item.note || "Market price"}</span>
-                )}
+              <div className="flex items-center gap-3 mb-2">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                  qty > 0 ? "bg-farm-leaf" : "bg-farm-sunshine"
+                }`}>
+                  <item.icon className={`w-5 h-5 ${qty > 0 ? "text-white" : "text-farm-soil"}`} />
+                </div>
+                <div>
+                  <h4 className="font-bold text-lg text-foreground">{item.name}</h4>
+                  <div className="flex items-center gap-3 mt-1">
+                    {item.price ? (
+                      <span className="font-bold text-farm-leaf">K{item.price}<span className="text-muted-foreground font-normal ml-1">/{item.unit}</span></span>
+                    ) : (
+                      <span className="text-sm text-farm-sunshine font-semibold italic">{item.note || "Market price"}</span>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-3 shrink-0">
               <button
                 onClick={() => updateQty(item.name, -1)}
-                className="w-8 h-8 rounded-lg border border-border bg-background flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors disabled:opacity-30"
+                className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                  qty === 0 
+                    ? "bg-farm-cloud border-farm text-muted-foreground cursor-not-allowed opacity-50" 
+                    : "bg-red-50 text-red-600 hover:bg-red-100 border-red-200 hover:scale-110"
+                }`}
                 disabled={qty === 0}
               >
                 <Minus className="w-4 h-4" />
               </button>
-              <span className="w-8 text-center font-bold text-foreground tabular-nums">{qty}</span>
+              <div className={`w-12 text-center font-bold text-lg tabular-nums ${
+                qty > 0 ? "text-farm-leaf" : "text-muted-foreground"
+              }`}>
+                {qty}
+              </div>
               <button
                 onClick={() => updateQty(item.name, 1)}
-                className="w-8 h-8 rounded-lg border border-primary/40 bg-primary/10 flex items-center justify-center text-primary hover:bg-primary/20 transition-colors"
+                className="w-10 h-10 bg-farm-leaf text-white rounded-xl flex items-center justify-center hover:bg-farm-forest transition-all duration-300 hover:scale-110 shadow-farm"
               >
                 <Plus className="w-4 h-4" />
               </button>
@@ -163,54 +177,89 @@ const OrderSection = () => {
   );
 
   return (
-    <section id="order" className="py-20 bg-muted/50">
+    <section id="order" className="py-24 bg-background">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-14 space-y-3">
-          <span className="text-secondary font-semibold uppercase tracking-widest text-sm">Farm Fresh Prices</span>
-          <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground">
-            Order <span className="text-primary">Now</span>
+        {/* Section Header */}
+        <div className="text-center mb-20 space-y-6">
+          <div className="inline-flex items-center gap-2 bg-farm-card rounded-full px-6 py-2 border-farm shadow-farm">
+            <ShoppingCart className="w-5 h-5 text-farm-leaf" />
+            <span className="text-sm font-semibold text-foreground uppercase tracking-wider">Order Now</span>
+            <ShoppingCart className="w-5 h-5 text-farm-leaf" />
+          </div>
+          <h2 className="text-4xl md:text-6xl font-bold leading-tight">
+            <span className="text-farm-sunshine">Fresh Prices</span>
+            <br />
+            <span className="text-foreground">Direct from Farm</span>
           </h2>
-          <p className="text-muted-foreground max-w-xl mx-auto">
-            Select your items, choose quantities, and send your order straight to WhatsApp.
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            Choose your fresh produce and quality livestock, set your quantities, 
+            and send your order directly via WhatsApp. Simple, transparent pricing.
           </p>
         </div>
 
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           <Tabs defaultValue="produce" className="w-full">
-            <TabsList className="w-full grid grid-cols-2 mb-6 h-12">
-              <TabsTrigger value="produce" className="text-sm font-semibold gap-1">🥬 Vegetables & Produce</TabsTrigger>
-              <TabsTrigger value="meat" className="text-sm font-semibold gap-1">🥩 Meat & Poultry</TabsTrigger>
+            {/* Modern Tab Navigation */}
+            <TabsList className="w-full grid grid-cols-2 mb-8 h-14 bg-farm-card rounded-2xl border-farm shadow-farm p-2">
+              <TabsTrigger value="produce" className="text-base font-semibold gap-3 rounded-xl data-[state=active]:bg-farm-leaf data-[state=active]:text-white transition-all duration-300">
+                <Leaf className="w-5 h-5" />
+                <span>Vegetables & Produce</span>
+              </TabsTrigger>
+              <TabsTrigger value="meat" className="text-base font-semibold gap-3 rounded-xl data-[state=active]:bg-farm-leaf data-[state=active]:text-white transition-all duration-300">
+                <Beef className="w-5 h-5" />
+                <span>Meat & Poultry</span>
+              </TabsTrigger>
             </TabsList>
-            <TabsContent value="produce">{renderItems(produceItems)}</TabsContent>
-            <TabsContent value="meat">{renderItems(meatItems)}</TabsContent>
+            
+            <TabsContent value="produce" className="space-y-4">
+              <div className="bg-farm-card rounded-3xl p-8 border-farm shadow-farm">
+                <h3 className="text-2xl font-bold text-farm-leaf mb-6">Fresh Vegetables</h3>
+                {renderItems(produceItems)}
+              </div>
+            </TabsContent>
+            <TabsContent value="meat" className="space-y-4">
+              <div className="bg-farm-card rounded-3xl p-8 border-farm shadow-farm">
+                <h3 className="text-2xl font-bold text-farm-sunshine mb-6">Quality Meat & Poultry</h3>
+                {renderItems(meatItems)}
+              </div>
+            </TabsContent>
           </Tabs>
 
-          {/* Cart Summary */}
+          {/* Modern Cart Summary */}
           {cartEntries.length > 0 && (
-            <div className="mt-8 p-6 rounded-2xl bg-card border border-border shadow-md space-y-4">
+            <div className="mt-12 bg-farm-card rounded-3xl p-8 border-farm shadow-farm-lg space-y-8">
               <div className="flex items-center justify-between">
-                <h3 className="font-display font-bold text-foreground flex items-center gap-2">
-                  <ShoppingCart className="w-5 h-5 text-primary" />
-                  Your Order ({cartEntries.length} item{cartEntries.length > 1 ? "s" : ""})
-                </h3>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-farm-leaf rounded-xl flex items-center justify-center">
+                    <ShoppingCart className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-foreground">Your Order</h3>
+                    <p className="text-muted-foreground">{cartEntries.length} item{cartEntries.length > 1 ? "s" : ""} selected</p>
+                  </div>
+                </div>
                 <button
                   onClick={clearCart}
-                  className="text-sm text-muted-foreground hover:text-destructive flex items-center gap-1 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-all duration-300 group"
                 >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  Clear
+                  <Trash2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                  <span className="font-medium">Clear All</span>
                 </button>
               </div>
 
-              <div className="divide-y divide-border">
+              <div className="space-y-4">
                 {cartEntries.map(([name, qty]) => {
                   const item = getItem(name);
                   return (
-                    <div key={name} className="flex items-center justify-between py-2.5">
-                      <span className="text-sm text-foreground">
-                        {item?.emoji} {name} × {qty}
-                      </span>
-                      <span className="text-sm font-semibold text-foreground">
+                    <div key={name} className="flex items-center justify-between p-4 bg-farm-cloud rounded-2xl border-farm">
+                      <div className="flex items-center gap-3">
+                        {item?.icon && <item.icon className="w-5 h-5 text-farm-leaf" />}
+                        <div>
+                          <span className="font-medium text-foreground">{name}</span>
+                          <span className="text-muted-foreground ml-2">× {qty}</span>
+                        </div>
+                      </div>
+                      <span className="font-bold text-lg text-foreground">
                         {item?.price ? `K${item.price * qty}` : "TBD"}
                       </span>
                     </div>
@@ -218,31 +267,33 @@ const OrderSection = () => {
                 })}
               </div>
 
-              <div className="flex items-center justify-between pt-2 border-t border-border">
-                <span className="font-display font-bold text-foreground text-lg">Total</span>
-                <div className="text-right">
-                  <span className="font-display font-bold text-primary text-xl">K{totalFixed}</span>
-                  {hasMarketPrice && (
-                    <p className="text-xs text-muted-foreground">+ market price items (to be confirmed)</p>
-                  )}
+              <div className="border-t border-farm-soil/20 pt-6">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-xl font-bold text-foreground">Total Amount</span>
+                  <div className="text-right">
+                    <span className="text-3xl font-bold text-farm-sunshine">K{totalFixed}</span>
+                    {hasMarketPrice && (
+                      <p className="text-sm text-muted-foreground mt-1">+ market price items (to be confirmed)</p>
+                    )}
+                  </div>
                 </div>
-              </div>
 
-              <div className="flex flex-col sm:flex-row gap-3">
-                <button
-                  onClick={downloadPdf}
-                  className="flex-1 inline-flex items-center justify-center gap-2 bg-secondary text-secondary-foreground font-semibold px-6 py-3.5 rounded-xl hover:bg-secondary/90 transition-all text-base"
-                >
-                  <FileDown className="w-5 h-5" />
-                  Download PDF Order
-                </button>
-                <button
-                  onClick={sendToWhatsApp}
-                  className="flex-1 inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold px-6 py-3.5 rounded-xl hover:bg-primary/90 transition-all text-base"
-                >
-                  <MessageCircle className="w-5 h-5" />
-                  Send via WhatsApp
-                </button>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <button
+                    onClick={downloadPdf}
+                    className="btn-sunshine group flex items-center justify-center gap-3 text-lg"
+                  >
+                    <FileDown className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                    Download PDF
+                  </button>
+                  <button
+                    onClick={sendToWhatsApp}
+                    className="btn-farm group flex items-center justify-center gap-3 text-lg"
+                  >
+                    <MessageCircle className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                    Send via WhatsApp
+                  </button>
+                </div>
               </div>
             </div>
           )}
