@@ -4,26 +4,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { generateOrderPdf } from "@/lib/generateOrderPdf";
 
-// Use direct image paths to avoid import issues with spaces in filenames
-const getImagePath = (filename: string) => new URL(`/src/assets/farm-photos/${filename}`, import.meta.url).href;
-
-// Image paths for products
-const chibwabwaImage = getImagePath("Chibwabwa.JPG");
-const chineseCabbageImage = getImagePath("ChineseCabbage.JPG");
-const cabbageImage = getImagePath("cabbage.JPG");
-const lumandaImage = getImagePath("Lumanda.JPG");
-const okraImage = getImagePath("Okra.JPG");
-const onionsImage = getImagePath("Onions.JPG");
-const tomatoesImage = getImagePath("Tomatoes.JPG");
-const goatMeatImage = getImagePath("Goat Meat.JPG");
-const porkChopsImage = getImagePath("Pork Chops.JPG");
-const img3844 = getImagePath("IMG_3844.JPG");
-const img3845 = getImagePath("IMG_3845.JPG");
-const img3849 = getImagePath("IMG_3849.JPG");
-const img3852 = getImagePath("IMG_3852.JPG");
-const img3853 = getImagePath("IMG_3853.JPG");
-const img3856 = getImagePath("IMG_3856.JPG");
-const pepperImage = getImagePath("pepper.JPG");
+// Dynamic imports for LFS files with spaces in names
+const getImagePath = (filename: string) => {
+  try {
+    return require(`@/assets/farm-photos/${filename}`);
+  } catch {
+    return `/src/assets/farm-photos/${filename}`;
+  }
+};
 
 const WHATSAPP_NUMBER = "260979654602";
 
@@ -37,25 +25,25 @@ interface OrderItem {
 }
 
 const vegetables: OrderItem[] = [
-  { name: "Rape", price: 5, unit: "bundle", icon: Leaf, image: img3845 }, // Generic leafy green
-  { name: "Chibwabwa", price: 5, unit: "bundle", icon: Leaf, image: chibwabwaImage }, // ✅ Direct match
-  { name: "Chinese Cabbage", price: 5, unit: "head", icon: Leaf, image: chineseCabbageImage }, // ✅ Direct match
-  { name: "Lumanda", price: 5, unit: "bundle", icon: Leaf, image: lumandaImage }, // ✅ Direct match
+  { name: "Rape", price: 5, unit: "bundle", icon: Leaf, image: getImagePath("IMG_3845.JPG") }, // Generic leafy green
+  { name: "Chibwabwa", price: 5, unit: "bundle", icon: Leaf, image: getImagePath("Chibwabwa.JPG") }, // ✅ Direct match
+  { name: "Chinese Cabbage", price: 5, unit: "head", icon: Leaf, image: getImagePath("ChineseCabbage.JPG") }, // ✅ Direct match
+  { name: "Lumanda", price: 5, unit: "bundle", icon: Leaf, image: getImagePath("Lumanda.JPG") }, // ✅ Direct match
   { name: "Impwa", price: 5, unit: "bundle", icon: Leaf }, // No image
-  { name: "Okra", price: 5, unit: "bundle", icon: Leaf, image: okraImage }, // ✅ Direct match
-  { name: "Onions", price: null, unit: "kg", icon: Leaf, note: "Market Price", image: onionsImage }, // ✅ Direct match
-  { name: "Tomatoes", price: null, unit: "kg", icon: Leaf, note: "Market Price", image: tomatoesImage }, // ✅ Direct match
+  { name: "Okra", price: 5, unit: "bundle", icon: Leaf, image: getImagePath("Okra.JPG") }, // ✅ Direct match
+  { name: "Onions", price: null, unit: "kg", icon: Leaf, note: "Market Price", image: getImagePath("Onions.JPG") }, // ✅ Direct match
+  { name: "Tomatoes", price: null, unit: "kg", icon: Leaf, note: "Market Price", image: getImagePath("Tomatoes.JPG") }, // ✅ Direct match
   { name: "Carrots", price: 10, unit: "bundle", icon: Leaf }, // No image
-  { name: "Green Pepper", price: 5, unit: "piece", icon: Leaf, image: pepperImage }, // ✅ Pepper image
-  { name: "Red & Yellow Pepper", price: 20, unit: "piece", icon: Leaf, image: pepperImage }, // ✅ Same pepper image
+  { name: "Green Pepper", price: 5, unit: "piece", icon: Leaf, image: getImagePath("pepper.JPG") }, // ✅ Pepper image
+  { name: "Red & Yellow Pepper", price: 20, unit: "piece", icon: Leaf, image: getImagePath("pepper.JPG") }, // ✅ Same pepper image
 ];
 
 const meat: OrderItem[] = [
-  { name: "Pork Chops", price: 110, unit: "kg", icon: Beef, image: porkChopsImage }, // ✅ Direct match
+  { name: "Pork Chops", price: 110, unit: "kg", icon: Beef, image: getImagePath("Pork Chops.JPG") }, // ✅ Direct match
   { name: "Mixed Cut Beef (Stew Cuts)", price: 120, unit: "kg", icon: Beef }, // No image
   { name: "Steak & Steak on Bone", price: 130, unit: "kg", icon: Beef }, // No image
   { name: "Lamb", price: 100, unit: "kg", icon: UtensilsCrossed }, // No image
-  { name: "Goat Meat", price: 100, unit: "kg", icon: Heart, image: goatMeatImage }, // ✅ Direct match
+  { name: "Goat Meat", price: 100, unit: "kg", icon: Heart, image: getImagePath("Goat Meat.JPG") }, // ✅ Direct match
   { name: "Beef Offals", price: 80, unit: "kg", icon: Beef }, // No image
   { name: "Goat Offals", price: 70, unit: "kg", icon: Heart }, // No image
   { name: "Pork Trotters", price: 70, unit: "kg", icon: Circle }, // No image

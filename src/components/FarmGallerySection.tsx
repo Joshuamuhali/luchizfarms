@@ -1,11 +1,17 @@
 import { useState } from "react";
 import { Camera, Heart, Sprout, TreePine, Sun, Wind, Droplets, Wheat } from "lucide-react";
 
+// Dynamic imports for LFS files with spaces in names
+const getImagePath = (filename: string) => {
+  try {
+    return require(`@/assets/farm-photos/${filename}`);
+  } catch {
+    return `/src/assets/farm-photos/${filename}`;
+  }
+};
+
 const FarmGallerySection = () => {
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
-
-  // Helper function to get image paths
-  const getImagePath = (filename: string) => new URL(`/src/assets/farm-photos/${filename}`, import.meta.url).href;
 
   // Use ALL the farm photos from 3u Export Photos
   const galleryImages = [
