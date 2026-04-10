@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Menu, X, Wheat, Phone, ShoppingCart } from "lucide-react";
-import logoImage from "@/assets/luchiz-farm-logo.jpg";
+import logoImage from "@/assets/logo.png";
 
 const navLinks = [
   { label: "Home", href: "#" },
   { label: "About", href: "#about" },
-  { label: "Products", href: "#products" },
   { label: "Order", href: "#order" },
+  { label: "Gallery", href: "#gallery" },
   { label: "How It Works", href: "#how-to-order" },
   { label: "Contact", href: "#contact" },
 ];

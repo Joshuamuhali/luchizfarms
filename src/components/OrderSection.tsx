@@ -4,6 +4,27 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { generateOrderPdf } from "@/lib/generateOrderPdf";
 
+// Use direct image paths to avoid TypeScript import issues
+const getImagePath = (filename: string) => `/src/assets/farm-photos/${filename}`;
+
+// Image paths for products
+const chibwabwaImage = getImagePath("Chibwabwa.JPG");
+const chineseCabbageImage = getImagePath("Chinese Cabbage.JPG");
+const cabbageImage = getImagePath("cabbage.JPG");
+const lumandaImage = getImagePath("Lumanda.JPG");
+const okraImage = getImagePath("Okra.JPG");
+const onionsImage = getImagePath("Onions.JPG");
+const tomatoesImage = getImagePath("Tomatoes.JPG");
+const goatMeatImage = getImagePath("Goat Meat.JPG");
+const porkChopsImage = getImagePath("Pork Chops.JPG");
+const img3844 = getImagePath("IMG_3844.JPG");
+const img3845 = getImagePath("IMG_3845.JPG");
+const img3849 = getImagePath("IMG_3849.JPG");
+const img3852 = getImagePath("IMG_3852.JPG");
+const img3853 = getImagePath("IMG_3853.JPG");
+const img3856 = getImagePath("IMG_3856.JPG");
+const pepperImage = getImagePath("pepper.JPG");
+
 const WHATSAPP_NUMBER = "260979654602";
 
 interface OrderItem {
@@ -12,34 +33,35 @@ interface OrderItem {
   unit: string;
   icon: any;
   note?: string;
+  image?: string;
 }
 
-const produceItems: OrderItem[] = [
-  { name: "Rape", price: 5, unit: "bundle", icon: Leaf },
-  { name: "Chibwabwa", price: 5, unit: "bundle", icon: Leaf },
-  { name: "Chinese Cabbage", price: 5, unit: "head", icon: Leaf },
-  { name: "Lumanda", price: 5, unit: "bundle", icon: Leaf },
-  { name: "Impwa", price: 5, unit: "bundle", icon: Leaf },
-  { name: "Okra", price: 5, unit: "bundle", icon: Leaf },
-  { name: "Onion", price: null, unit: "kg", icon: Leaf, note: "Market price" },
-  { name: "Tomatoes", price: null, unit: "kg", icon: Leaf, note: "Market price" },
-  { name: "Carrots", price: 10, unit: "bundle", icon: Leaf },
-  { name: "Green Pepper", price: 5, unit: "piece", icon: Leaf },
-  { name: "Red & Yellow Pepper", price: 20, unit: "piece", icon: Leaf },
+const vegetables: OrderItem[] = [
+  { name: "Rape", price: 5, unit: "bundle", icon: Leaf, image: img3845 }, // Generic leafy green
+  { name: "Chibwabwa", price: 5, unit: "bundle", icon: Leaf, image: chibwabwaImage }, // ✅ Direct match
+  { name: "Chinese Cabbage", price: 5, unit: "head", icon: Leaf, image: chineseCabbageImage }, // ✅ Direct match
+  { name: "Lumanda", price: 5, unit: "bundle", icon: Leaf, image: lumandaImage }, // ✅ Direct match
+  { name: "Impwa", price: 5, unit: "bundle", icon: Leaf }, // No image
+  { name: "Okra", price: 5, unit: "bundle", icon: Leaf, image: okraImage }, // ✅ Direct match
+  { name: "Onions", price: null, unit: "kg", icon: Leaf, note: "Market Price", image: onionsImage }, // ✅ Direct match
+  { name: "Tomatoes", price: null, unit: "kg", icon: Leaf, note: "Market Price", image: tomatoesImage }, // ✅ Direct match
+  { name: "Carrots", price: 10, unit: "bundle", icon: Leaf }, // No image
+  { name: "Green Pepper", price: 5, unit: "piece", icon: Leaf, image: pepperImage }, // ✅ Pepper image
+  { name: "Red & Yellow Pepper", price: 20, unit: "piece", icon: Leaf, image: pepperImage }, // ✅ Same pepper image
 ];
 
-const meatItems: OrderItem[] = [
-  { name: "Pork Chops", price: 110, unit: "kg", icon: Beef },
-  { name: "Mixed Cut Beef", price: 120, unit: "kg", icon: Beef },
-  { name: "Steak / Steak on Bone", price: 130, unit: "kg", icon: Beef },
-  { name: "Lamb", price: 100, unit: "kg", icon: UtensilsCrossed },
-  { name: "Goat Meat", price: 100, unit: "kg", icon: Heart },
-  { name: "Beef Offals", price: 80, unit: "kg", icon: Beef },
-  { name: "Goat Offals", price: 70, unit: "kg", icon: Heart },
-  { name: "Pork Trotters", price: 70, unit: "kg", icon: Circle },
-  { name: "Cow Trotters", price: null, unit: "piece", icon: Square, note: "Price varies by size" },
-  { name: "Village Chicken", price: 150, unit: "whole", icon: Drumstick },
-  { name: "Broiler Chicken", price: 150, unit: "whole", icon: Bird },
+const meat: OrderItem[] = [
+  { name: "Pork Chops", price: 110, unit: "kg", icon: Beef, image: porkChopsImage }, // ✅ Direct match
+  { name: "Mixed Cut Beef (Stew Cuts)", price: 120, unit: "kg", icon: Beef }, // No image
+  { name: "Steak & Steak on Bone", price: 130, unit: "kg", icon: Beef }, // No image
+  { name: "Lamb", price: 100, unit: "kg", icon: UtensilsCrossed }, // No image
+  { name: "Goat Meat", price: 100, unit: "kg", icon: Heart, image: goatMeatImage }, // ✅ Direct match
+  { name: "Beef Offals", price: 80, unit: "kg", icon: Beef }, // No image
+  { name: "Goat Offals", price: 70, unit: "kg", icon: Heart }, // No image
+  { name: "Pork Trotters", price: 70, unit: "kg", icon: Circle }, // No image
+  { name: "Cow Trotters", price: null, unit: "piece", icon: Square, note: "Contact for pricing" }, // No image
+  { name: "Broiler Chicken (Dressed)", price: 150, unit: "whole", icon: Bird }, // No image
+  { name: "Village Chicken (Dressed)", price: 150, unit: "whole", icon: Drumstick }, // No image
 ];
 
 const OrderSection = () => {
@@ -58,7 +80,7 @@ const OrderSection = () => {
     });
   };
 
-  const allItems = [...produceItems, ...meatItems];
+  const allItems = [...vegetables, ...meat];
   const cartEntries = Object.entries(cart).filter(([, qty]) => qty > 0);
 
   const getItem = (name: string) => allItems.find((i) => i.name === name);
@@ -115,60 +137,82 @@ const OrderSection = () => {
   const clearCart = () => setCart({});
 
   const renderItems = (items: OrderItem[]) => (
-    <div className="grid gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {items.map((item) => {
         const qty = cart[item.name] || 0;
         return (
           <div
             key={item.name}
-            className={`flex items-center justify-between p-6 rounded-2xl border transition-all duration-300 ${
-              qty > 0
-                ? "border-farm-leaf/50 bg-farm-leaf/5 shadow-farm scale-[1.02]"
-                : "border-farm-soil/20 bg-farm-cloud hover:bg-farm-sky/30"
-            }`}
+            className="group bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
           >
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-3 mb-2">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                  qty > 0 ? "bg-farm-leaf" : "bg-farm-sunshine"
-                }`}>
-                  <item.icon className={`w-5 h-5 ${qty > 0 ? "text-white" : "text-farm-soil"}`} />
+            {/* Instagram-style Image */}
+            <div className="relative aspect-square">
+              <img
+                src={item.image}
+                alt={item.name}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              
+              {/* Product Badge */}
+              <div className="absolute top-3 right-3">
+                <div className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg">
+                  <item.icon className="w-5 h-5 text-farm-leaf" />
                 </div>
-                <div>
-                  <h4 className="font-bold text-lg text-foreground">{item.name}</h4>
-                  <div className="flex items-center gap-3 mt-1">
-                    {item.price ? (
-                      <span className="font-bold text-farm-leaf">K{item.price}<span className="text-muted-foreground font-normal ml-1">/{item.unit}</span></span>
-                    ) : (
-                      <span className="text-sm text-farm-sunshine font-semibold italic">{item.note || "Market price"}</span>
-                    )}
-                  </div>
-                </div>
+              </div>
+
+              {/* Quick Add Button (appears on hover) */}
+              <div className="absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <button
+                  onClick={() => updateQty(item.name, 1)}
+                  className="w-full bg-farm-leaf text-white py-2 px-4 rounded-xl font-medium hover:bg-farm-forest transition-colors duration-200 shadow-lg"
+                >
+                  Quick Add
+                </button>
               </div>
             </div>
-            <div className="flex items-center gap-3 shrink-0">
-              <button
-                onClick={() => updateQty(item.name, -1)}
-                className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
-                  qty === 0 
-                    ? "bg-farm-cloud border-farm text-muted-foreground cursor-not-allowed opacity-50" 
-                    : "bg-red-50 text-red-600 hover:bg-red-100 border-red-200 hover:scale-110"
-                }`}
-                disabled={qty === 0}
-              >
-                <Minus className="w-4 h-4" />
-              </button>
-              <div className={`w-12 text-center font-bold text-lg tabular-nums ${
-                qty > 0 ? "text-farm-leaf" : "text-muted-foreground"
-              }`}>
-                {qty}
+
+            {/* Product Info */}
+            <div className="p-4 space-y-3">
+              <div>
+                <h4 className="font-bold text-lg text-foreground mb-1">{item.name}</h4>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                    {item.unit}
+                  </span>
+                  {item.price ? (
+                    <span className="font-bold text-farm-leaf text-lg">K{item.price}</span>
+                  ) : (
+                    <span className="text-sm text-farm-sunshine font-semibold">{item.note || "Market Price"}</span>
+                  )}
+                </div>
               </div>
-              <button
-                onClick={() => updateQty(item.name, 1)}
-                className="w-10 h-10 bg-farm-leaf text-white rounded-xl flex items-center justify-center hover:bg-farm-forest transition-all duration-300 hover:scale-110 shadow-farm"
-              >
-                <Plus className="w-4 h-4" />
-              </button>
+
+              {/* Quantity Controls */}
+              <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
+                <button
+                  onClick={() => updateQty(item.name, -1)}
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 ${
+                    qty === 0 
+                      ? "bg-gray-100 text-gray-400 cursor-not-allowed" 
+                      : "bg-red-50 text-red-600 hover:bg-red-100"
+                  }`}
+                  disabled={qty === 0}
+                >
+                  <Minus className="w-3 h-3" />
+                </button>
+                <div className={`flex-1 text-center font-bold text-lg ${
+                  qty > 0 ? "text-farm-leaf" : "text-gray-400"
+                }`}>
+                  {qty || 0}
+                </div>
+                <button
+                  onClick={() => updateQty(item.name, 1)}
+                  className="w-8 h-8 bg-farm-leaf text-white rounded-lg flex items-center justify-center hover:bg-farm-forest transition-all duration-200"
+                >
+                  <Plus className="w-3 h-3" />
+                </button>
+              </div>
             </div>
           </div>
         );
@@ -187,23 +231,23 @@ const OrderSection = () => {
             <ShoppingCart className="w-5 h-5 text-farm-leaf" />
           </div>
           <h2 className="text-4xl md:text-6xl font-bold leading-tight">
-            <span className="text-farm-sunshine">Fresh Prices</span>
+            <span className="text-farm-sunshine">Order Your Products</span>
             <br />
             <span className="text-foreground">Direct from Farm</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Choose your fresh produce and quality livestock, set your quantities, 
-            and send your order directly via WhatsApp. Simple, transparent pricing.
+            Choose your fresh vegetables and meat, set your quantities, 
+            and send your order directly via WhatsApp. Clear pricing. Direct supply.
           </p>
         </div>
 
         <div className="max-w-4xl mx-auto">
-          <Tabs defaultValue="produce" className="w-full">
+          <Tabs defaultValue="vegetables" className="w-full">
             {/* Modern Tab Navigation */}
-            <TabsList className="w-full grid grid-cols-2 mb-8 h-14 bg-farm-card rounded-2xl border-farm shadow-farm p-2">
-              <TabsTrigger value="produce" className="text-base font-semibold gap-3 rounded-xl data-[state=active]:bg-farm-leaf data-[state=active]:text-white transition-all duration-300">
+            <TabsList className="grid w-full grid-cols-2 mb-8 bg-farm-card rounded-2xl p-2 border-farm shadow-farm">
+              <TabsTrigger value="vegetables" className="text-base font-semibold gap-3 rounded-xl data-[state=active]:bg-farm-leaf data-[state=active]:text-white transition-all duration-300">
                 <Leaf className="w-5 h-5" />
-                <span>Vegetables & Produce</span>
+                <span>Fresh Vegetables</span>
               </TabsTrigger>
               <TabsTrigger value="meat" className="text-base font-semibold gap-3 rounded-xl data-[state=active]:bg-farm-leaf data-[state=active]:text-white transition-all duration-300">
                 <Beef className="w-5 h-5" />
@@ -211,16 +255,16 @@ const OrderSection = () => {
               </TabsTrigger>
             </TabsList>
             
-            <TabsContent value="produce" className="space-y-4">
+            <TabsContent value="vegetables" className="space-y-4">
               <div className="bg-farm-card rounded-3xl p-8 border-farm shadow-farm">
                 <h3 className="text-2xl font-bold text-farm-leaf mb-6">Fresh Vegetables</h3>
-                {renderItems(produceItems)}
+                {renderItems(vegetables)}
               </div>
             </TabsContent>
             <TabsContent value="meat" className="space-y-4">
               <div className="bg-farm-card rounded-3xl p-8 border-farm shadow-farm">
-                <h3 className="text-2xl font-bold text-farm-sunshine mb-6">Quality Meat & Poultry</h3>
-                {renderItems(meatItems)}
+                <h3 className="text-2xl font-bold text-farm-sunshine mb-6">Meat & Poultry</h3>
+                {renderItems(meat)}
               </div>
             </TabsContent>
           </Tabs>
