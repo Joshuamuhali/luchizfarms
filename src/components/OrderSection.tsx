@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { generateOrderPdf } from "@/lib/generateOrderPdf";
 
 // Helper function to get image paths
-const getImagePath = (filename: string) => `/src/assets/farm-photos/${filename}`;
+const getImagePath = (filename: string) => `/assets/farm-photos/${filename}`;
 
 const WHATSAPP_NUMBER = "260979654602";
 

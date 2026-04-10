@@ -1,4 +1,4 @@
-import logoImage from "@/assets/main.png";
+const logoImage = "/assets/main.png";
 import { MapPin, Home, Flag } from "lucide-react";
 
 const AboutSection = () => {

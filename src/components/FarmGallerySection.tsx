@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Camera, Heart, Sprout, TreePine, Sun, Wind, Droplets, Wheat } from "lucide-react";
 
 // Helper function to get image paths
-const getImagePath = (filename: string) => `/src/assets/farm-photos/${filename}`;
+const getImagePath = (filename: string) => `/assets/farm-photos/${filename}`;
 
 const FarmGallerySection = () => {
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
