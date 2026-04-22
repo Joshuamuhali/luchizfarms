@@ -2,14 +2,5 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
-  "installCommand": "npm install",
-  "functions": {
-    "directory": "functions"
-  },
-  "routes": [
-    {
-      "src": "dist/assets",
-      "dest": "/assets"
-    }
-  ]
+  "installCommand": "npm install"
 }
