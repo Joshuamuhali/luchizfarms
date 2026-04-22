@@ -1,5 +1,7 @@
 import { supabase } from './supabase'
 
+// Supabase client for database operations
+
 export interface Product {
   id: string;
   name: string;
