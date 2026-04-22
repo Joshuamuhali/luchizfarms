@@ -1,206 +1,299 @@
 import { useState } from "react";
+import React from "react";
 import { ShoppingCart, MessageCircle, Plus, Minus, Trash2, FileDown, Leaf, Beef, UtensilsCrossed, Heart, Circle, Square, Drumstick, Bird } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { generateOrderPdf } from "@/lib/generateOrderPdf";
-
-// Helper function to get image paths
-const getImagePath = (filename: string) => `/assets/farm-photos/${filename}`;
+import { useProducts } from "@/hooks/useProducts";
+import { Product, DataService } from "@/lib/data-service";
 
 const WHATSAPP_NUMBER = "260979654602";
 
-interface OrderItem {
-  name: string;
-  price: number | null;
-  unit: string;
-  icon: any;
-  note?: string;
-  image?: string;
-}
-
-const vegetables: OrderItem[] = [
-  { name: "Rape", price: 5, unit: "bundle", icon: Leaf, image: getImagePath("IMG_3845.JPG") }, // Generic leafy green
-  { name: "Chibwabwa", price: 5, unit: "bundle", icon: Leaf, image: getImagePath("Chibwabwa.JPG") }, // ✅ Direct match
-  { name: "Chinese Cabbage", price: 5, unit: "head", icon: Leaf, image: getImagePath("ChineseCabbage.JPG") }, // ✅ Direct match
-  { name: "Lumanda", price: 5, unit: "bundle", icon: Leaf, image: getImagePath("Lumanda.JPG") }, // ✅ Direct match
-  { name: "Impwa", price: 5, unit: "bundle", icon: Leaf }, // No image
-  { name: "Okra", price: 5, unit: "bundle", icon: Leaf, image: getImagePath("Okra.JPG") }, // ✅ Direct match
-  { name: "Onions", price: null, unit: "kg", icon: Leaf, note: "Market Price", image: getImagePath("Onions.JPG") }, // ✅ Direct match
-  { name: "Tomatoes", price: null, unit: "kg", icon: Leaf, note: "Market Price", image: getImagePath("Tomatoes.JPG") }, // ✅ Direct match
-  { name: "Carrots", price: 10, unit: "bundle", icon: Leaf }, // No image
-  { name: "Green Pepper", price: 5, unit: "piece", icon: Leaf, image: getImagePath("pepper.JPG") }, // ✅ Pepper image
-  { name: "Red & Yellow Pepper", price: 20, unit: "piece", icon: Leaf, image: getImagePath("pepper.JPG") }, // ✅ Same pepper image
-];
-
-const meat: OrderItem[] = [
-  { name: "Pork Chops", price: 110, unit: "kg", icon: Beef, image: getImagePath("Pork Chops.JPG") }, // ✅ Direct match
-  { name: "Mixed Cut Beef (Stew Cuts)", price: 120, unit: "kg", icon: Beef }, // No image
-  { name: "Steak & Steak on Bone", price: 130, unit: "kg", icon: Beef }, // No image
-  { name: "Lamb", price: 100, unit: "kg", icon: UtensilsCrossed }, // No image
-  { name: "Goat Meat", price: 100, unit: "kg", icon: Heart, image: getImagePath("Goat Meat.JPG") }, // ✅ Direct match
-  { name: "Beef Offals", price: 80, unit: "kg", icon: Beef }, // No image
-  { name: "Goat Offals", price: 70, unit: "kg", icon: Heart }, // No image
-  { name: "Pork Trotters", price: 70, unit: "kg", icon: Circle }, // No image
-  { name: "Cow Trotters", price: null, unit: "piece", icon: Square, note: "Contact for pricing" }, // No image
-  { name: "Broiler Chicken (Dressed)", price: 150, unit: "whole", icon: Bird }, // No image
-  { name: "Village Chicken (Dressed)", price: 150, unit: "whole", icon: Drumstick }, // No image
-];
-
 const OrderSection = () => {
   const { toast } = useToast();
+  const { vegetables, meat, allItems, loading, error, getProductById } = useProducts();
   const [cart, setCart] = useState<Record<string, number>>({});
 
-  const updateQty = (name: string, delta: number) => {
+  // Icon mapping
+  const getIcon = (iconName: string) => {
+    const icons: Record<string, any> = {
+      'Leaf': Leaf, 'Beef': Beef, 'UtensilsCrossed': UtensilsCrossed,
+      'Heart': Heart, 'Circle': Circle, 'Square': Square, 'Bird': Bird, 'Drumstick': Drumstick
+    };
+    return icons[iconName] || Leaf;
+  };
+
+  // Get primary image for product
+  const getPrimaryImage = (product: Product) => {
+    return product.image_url || "/placeholder.svg";
+  };
+
+  // Get icon from product's category
+  const getCategoryIcon = (product: any) => {
+    return 'Leaf';
+  };
+
+  // Cart functions - use product IDs instead of names
+  const updateQty = (productId: string, delta: number) => {
     setCart((prev) => {
-      const current = prev[name] || 0;
+      const current = prev[productId] || 0;
       const next = Math.max(0, current + delta);
       if (next === 0) {
-        const { [name]: _, ...rest } = prev;
+        const { [productId]: _, ...rest } = prev;
         return rest;
       }
-      return { ...prev, [name]: next };
+      return { ...prev, [productId]: next };
     });
   };
 
-  const allItems = [...vegetables, ...meat];
   const cartEntries = Object.entries(cart).filter(([, qty]) => qty > 0);
 
-  const getItem = (name: string) => allItems.find((i) => i.name === name);
-
-  const totalFixed = cartEntries.reduce((sum, [name, qty]) => {
-    const item = getItem(name);
-    return item?.price ? sum + item.price * qty : sum;
+  const totalFixed = cartEntries.reduce((sum, [productId, qty]) => {
+    const product = getProductById(productId);
+    return product?.price ? sum + product.price * qty : sum;
   }, 0);
 
-  const hasMarketPrice = cartEntries.some(([name]) => !getItem(name)?.price);
+  const hasMarketPrice = cartEntries.some(([productId]) => !getProductById(productId)?.price);
 
-  const buildCartItems = () =>
-    cartEntries.map(([name, qty]) => {
-      const item = getItem(name)!;
-      return { name, icon: item.icon, price: item.price, unit: item.unit, qty, note: item.note };
-    });
+  // Customer info state for order
+  const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [deliveryAddress, setDeliveryAddress] = useState('');
+  const [deliveryNotes, setDeliveryNotes] = useState('');
+
+  // Check if product is out of stock
+  const isOutOfStock = (product: Product) => product.stock_quantity <= 0;
+
+  // Check if product is low stock
+  const isLowStock = (product: Product) => product.stock_quantity > 0 && product.stock_quantity <= product.low_stock_threshold;
+
+  // Create order in Supabase
+  const createOrder = async () => {
+    try {
+      const orderData = {
+        customer_name: customerName || 'Guest',
+        customer_phone: customerPhone || 'N/A',
+        delivery_address: deliveryAddress || undefined,
+        delivery_notes: deliveryNotes || undefined,
+        total: totalFixed,
+        has_market_items: hasMarketPrice,
+        order_items: cartEntries.map(([productId, qty]) => {
+          const product = getProductById(productId)!;
+          return {
+            product_id: productId,
+            product_name: product.name,
+            qty: qty,
+            unit_price: product.price,
+            unit: product.unit,
+            subtotal: product.price ? product.price * qty : 0
+          };
+        })
+      };
+
+      const order = await DataService.createOrder(orderData);
+      return order;
+    } catch (error) {
+      toast({
+        title: "Error creating order",
+        description: "Please try again",
+        variant: "destructive"
+      });
+      throw error;
+    }
+  };
+
+  // WhatsApp integration
+  const sendToWhatsApp = async () => {
+    if (cartEntries.length === 0) {
+      toast({ title: "Cart is empty", description: "Please add items to your order first." });
+      return;
+    }
+
+    try {
+      // Create order first
+      const order = await createOrder();
+
+      // Build WhatsApp message
+      const lines = cartEntries.map(([productId, qty]) => {
+        const product = getProductById(productId);
+        const priceStr = product?.price ? `K${product.price}/${product.unit}` : "Market price";
+        const subtotal = product?.price ? ` = K${product.price * qty}` : "";
+        return `· ${qty}x ${product?.name} (${priceStr})${subtotal}`;
+      });
+
+      const text = [
+        "Hi Luchiz Farm! I'd like to place an order:",
+        "",
+        `Order ID: ${order.id}`,
+        ...lines,
+        "",
+        `Subtotal: K${totalFixed}${hasMarketPrice ? " + market price items" : ""}`,
+        "",
+        "Please confirm availability and total. Thank you!",
+      ].join("\n");
+
+      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`, "_blank");
+      toast({ title: "Order created!", description: "Redirecting to WhatsApp..." });
+    } catch (error) {
+      console.error('WhatsApp error:', error);
+    }
+  };
 
   const downloadPdf = () => {
     if (cartEntries.length === 0) {
       toast({ title: "Cart is empty", description: "Please add items to your order first." });
       return;
     }
-    generateOrderPdf(buildCartItems(), totalFixed, hasMarketPrice);
-    toast({ title: "PDF downloaded!", description: "You can now attach it in your WhatsApp chat." });
-  };
-
-  const sendToWhatsApp = () => {
-    if (cartEntries.length === 0) {
-      toast({ title: "Cart is empty", description: "Please add items to your order first." });
-      return;
-    }
-
-    const lines = cartEntries.map(([name, qty]) => {
-      const item = getItem(name);
-      const priceStr = item?.price ? `K${item.price}/${item.unit}` : "Market price";
-      const subtotal = item?.price ? ` = K${item.price * qty}` : "";
-      return `• ${qty}x ${name} (${priceStr})${subtotal}`;
+    
+    const cartItems = cartEntries.map(([productId, qty]) => {
+      const product = getProductById(productId)!;
+      return {
+        name: product.name,
+        icon: getIcon(getCategoryIcon(product)),
+        price: product.price,
+        unit: product.unit,
+        qty,
+        note: product.market_note
+      };
     });
-
-    const text = [
-      "Hi Luchiz Farm! I'd like to place an order:",
-      "",
-      ...lines,
-      "",
-      `Subtotal: K${totalFixed}${hasMarketPrice ? " + market price items" : ""}`,
-      "",
-      "Please confirm availability and total. Thank you!",
-    ].join("\n");
-
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`, "_blank");
-    toast({ title: "Order sent!", description: "Redirecting to WhatsApp..." });
+    
+    generateOrderPdf(cartItems, totalFixed, hasMarketPrice);
+    toast({ title: "PDF downloaded!", description: "You can now attach it in your WhatsApp chat." });
   };
 
   const clearCart = () => setCart({});
 
-  const renderItems = (items: OrderItem[]) => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {items.map((item) => {
-        const qty = cart[item.name] || 0;
-        return (
-          <div
-            key={item.name}
-            className="group bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-          >
-            {/* Instagram-style Image */}
-            <div className="relative aspect-square">
-              <img
-                src={item.image}
-                alt={item.name}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              
-              {/* Product Badge */}
-              <div className="absolute top-3 right-3">
-                <div className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg">
-                  <item.icon className="w-5 h-5 text-farm-leaf" />
-                </div>
-              </div>
+  // Render product item
+  const renderProductItem = (product: Product) => {
+    const qty = cart[product.id] || 0;
+    const primaryImage = getPrimaryImage(product);
+    const outOfStock = isOutOfStock(product);
+    const lowStock = isLowStock(product);
 
-              {/* Quick Add Button (appears on hover) */}
-              <div className="absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <button
-                  onClick={() => updateQty(item.name, 1)}
-                  className="w-full bg-farm-leaf text-white py-2 px-4 rounded-xl font-medium hover:bg-farm-forest transition-colors duration-200 shadow-lg"
-                >
-                  Quick Add
-                </button>
-              </div>
+    return (
+      <div
+        key={product.id}
+        className={`group bg-white rounded-2xl border overflow-hidden transition-all duration-300 hover:-translate-y-1 ${
+          outOfStock ? 'border-gray-300 opacity-60' : 'border-gray-200 hover:shadow-xl'
+        }`}
+      >
+        {/* Product Image */}
+        <div className="relative aspect-square">
+          <img
+            src={primaryImage}
+            alt={product.name}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            onError={(e) => {
+              e.currentTarget.src = "/placeholder.svg";
+            }}
+            loading="lazy"
+            decoding="async"
+          />
+
+          {/* Stock Badge */}
+          {outOfStock ? (
+            <div className="absolute top-3 left-3">
+              <span className="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">Out of Stock</span>
             </div>
+          ) : lowStock ? (
+            <div className="absolute top-3 left-3">
+              <span className="bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full">Low Stock</span>
+            </div>
+          ) : null}
 
-            {/* Product Info */}
-            <div className="p-4 space-y-3">
-              <div>
-                <h4 className="font-bold text-lg text-foreground mb-1">{item.name}</h4>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                    {item.unit}
-                  </span>
-                  {item.price ? (
-                    <span className="font-bold text-farm-leaf text-lg">K{item.price}</span>
-                  ) : (
-                    <span className="text-sm text-farm-sunshine font-semibold">{item.note || "Market Price"}</span>
-                  )}
-                </div>
-              </div>
-
-              {/* Quantity Controls */}
-              <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
-                <button
-                  onClick={() => updateQty(item.name, -1)}
-                  className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 ${
-                    qty === 0 
-                      ? "bg-gray-100 text-gray-400 cursor-not-allowed" 
-                      : "bg-red-50 text-red-600 hover:bg-red-100"
-                  }`}
-                  disabled={qty === 0}
-                >
-                  <Minus className="w-3 h-3" />
-                </button>
-                <div className={`flex-1 text-center font-bold text-lg ${
-                  qty > 0 ? "text-farm-leaf" : "text-gray-400"
-                }`}>
-                  {qty || 0}
-                </div>
-                <button
-                  onClick={() => updateQty(item.name, 1)}
-                  className="w-8 h-8 bg-farm-leaf text-white rounded-lg flex items-center justify-center hover:bg-farm-forest transition-all duration-200"
-                >
-                  <Plus className="w-3 h-3" />
-                </button>
-              </div>
+          {/* Product Badge */}
+          <div className="absolute top-3 right-3">
+            <div className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg">
+              {React.createElement(getIcon(getCategoryIcon(product)), { className: "w-5 h-5 text-farm-leaf" })}
             </div>
           </div>
-        );
-      })}
-    </div>
-  );
+
+          {/* Quick Add Button - disabled if out of stock */}
+          {!outOfStock && (
+            <div className="absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <button
+                onClick={() => updateQty(product.id, 1)}
+                className="w-full bg-farm-leaf text-white py-2 px-4 rounded-xl font-medium hover:bg-farm-forest transition-colors duration-200 shadow-lg"
+              >
+                Quick Add
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Product Info */}
+        <div className="p-4 space-y-3">
+          <div>
+            <h4 className="font-bold text-lg text-foreground mb-1">{product.name}</h4>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                {product.unit}
+              </span>
+              {product.price ? (
+                <span className="font-bold text-farm-leaf text-lg">K{product.price}</span>
+              ) : (
+                <span className="text-sm text-farm-sunshine font-semibold">{product.market_note || "Market Price"}</span>
+              )}
+            </div>
+          </div>
+
+          {/* Quantity Controls */}
+          <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
+            <button
+              onClick={() => updateQty(product.id, -1)}
+              className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 ${
+                qty === 0
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-red-50 text-red-600 hover:bg-red-100"
+              }`}
+              disabled={qty === 0}
+            >
+              <Minus className="w-3 h-3" />
+            </button>
+            <div className={`flex-1 text-center font-bold text-lg ${
+              qty > 0 ? "text-farm-leaf" : "text-gray-400"
+            }`}>
+              {qty || 0}
+            </div>
+            <button
+              onClick={() => updateQty(product.id, 1)}
+              disabled={outOfStock}
+              className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 ${
+                outOfStock
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-farm-leaf text-white hover:bg-farm-forest"
+              }`}
+            >
+              <Plus className="w-3 h-3" />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Loading state
+  if (loading) {
+    return (
+      <section className="py-24 bg-background">
+        <div className="container mx-auto px-4 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-farm-leaf mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Loading products...</p>
+        </div>
+      </section>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <section className="py-24 bg-background">
+        <div className="container mx-auto px-4 text-center">
+          <p className="text-red-600">Failed to load products: {error}</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="order" className="py-24 bg-background">
@@ -240,13 +333,17 @@ const OrderSection = () => {
             <TabsContent value="vegetables" className="space-y-4">
               <div className="bg-farm-card rounded-3xl p-8 border-farm shadow-farm">
                 <h3 className="text-2xl font-bold text-farm-leaf mb-6">Fresh Vegetables</h3>
-                {renderItems(vegetables)}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {vegetables.map(renderProductItem)}
+                </div>
               </div>
             </TabsContent>
             <TabsContent value="meat" className="space-y-4">
               <div className="bg-farm-card rounded-3xl p-8 border-farm shadow-farm">
                 <h3 className="text-2xl font-bold text-farm-sunshine mb-6">Meat & Poultry</h3>
-                {renderItems(meat)}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {meat.map(renderProductItem)}
+                </div>
               </div>
             </TabsContent>
           </Tabs>
@@ -274,23 +371,70 @@ const OrderSection = () => {
               </div>
 
               <div className="space-y-4">
-                {cartEntries.map(([name, qty]) => {
-                  const item = getItem(name);
+                {cartEntries.map(([productId, qty]) => {
+                  const product = getProductById(productId);
                   return (
-                    <div key={name} className="flex items-center justify-between p-4 bg-farm-cloud rounded-2xl border-farm">
+                    <div key={productId} className="flex items-center justify-between p-4 bg-farm-cloud rounded-2xl border-farm">
                       <div className="flex items-center gap-3">
-                        {item?.icon && <item.icon className="w-5 h-5 text-farm-leaf" />}
+                        {React.createElement(getIcon(product ? getCategoryIcon(product) : 'Leaf'), { className: "w-5 h-5 text-farm-leaf" })}
                         <div>
-                          <span className="font-medium text-foreground">{name}</span>
+                          <span className="font-medium text-foreground">{product?.name}</span>
                           <span className="text-muted-foreground ml-2">× {qty}</span>
                         </div>
                       </div>
                       <span className="font-bold text-lg text-foreground">
-                        {item?.price ? `K${item.price * qty}` : "TBD"}
+                        {product?.price ? `K${product.price * qty}` : "TBD"}
                       </span>
                     </div>
                   );
                 })}
+              </div>
+
+              {/* Customer Info */}
+              <div className="bg-farm-cloud rounded-2xl p-6 border-farm space-y-4">
+                <h4 className="font-bold text-foreground">Your Details</h4>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-muted-foreground mb-1">Name *</label>
+                    <input
+                      type="text"
+                      value={customerName}
+                      onChange={(e) => setCustomerName(e.target.value)}
+                      placeholder="Your name"
+                      className="w-full px-4 py-2 rounded-xl border border-gray-200 focus:border-farm-leaf focus:ring-1 focus:ring-farm-leaf outline-none transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-muted-foreground mb-1">Phone *</label>
+                    <input
+                      type="tel"
+                      value={customerPhone}
+                      onChange={(e) => setCustomerPhone(e.target.value)}
+                      placeholder="Your phone number"
+                      className="w-full px-4 py-2 rounded-xl border border-gray-200 focus:border-farm-leaf focus:ring-1 focus:ring-farm-leaf outline-none transition-colors"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-muted-foreground mb-1">Delivery Address</label>
+                  <input
+                    type="text"
+                    value={deliveryAddress}
+                    onChange={(e) => setDeliveryAddress(e.target.value)}
+                    placeholder="Where should we deliver? (optional)"
+                    className="w-full px-4 py-2 rounded-xl border border-gray-200 focus:border-farm-leaf focus:ring-1 focus:ring-farm-leaf outline-none transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-muted-foreground mb-1">Delivery Notes</label>
+                  <textarea
+                    value={deliveryNotes}
+                    onChange={(e) => setDeliveryNotes(e.target.value)}
+                    placeholder="Any special instructions? (optional)"
+                    rows={2}
+                    className="w-full px-4 py-2 rounded-xl border border-gray-200 focus:border-farm-leaf focus:ring-1 focus:ring-farm-leaf outline-none transition-colors resize-none"
+                  />
+                </div>
               </div>
 
               <div className="border-t border-farm-soil/20 pt-6">

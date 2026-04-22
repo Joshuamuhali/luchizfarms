@@ -1,36 +1,10 @@
 import { MessageCircle, Carrot, Beef } from "lucide-react";
+import { useProducts } from "@/hooks/useProducts";
 
 const WHATSAPP_LINK = "https://wa.me/260979654602";
 
-const vegetables = [
-  { name: "Rape", price: 5, unit: "bundle" },
-  { name: "Chibwabwa", price: 5, unit: "bundle" },
-  { name: "Chinese Cabbage", price: 5, unit: "head" },
-  { name: "Lumanda", price: 5, unit: "bundle" },
-  { name: "Impwa", price: 5, unit: "bundle" },
-  { name: "Okra", price: 5, unit: "bundle" },
-  { name: "Onions", price: null, unit: "kg", note: "Market Price" },
-  { name: "Tomatoes", price: null, unit: "kg", note: "Market Price" },
-  { name: "Carrots", price: 10, unit: "bundle" },
-  { name: "Green Pepper", price: 5, unit: "piece" },
-  { name: "Red & Yellow Pepper", price: 20, unit: "piece" },
-];
-
-const meat = [
-  { name: "Pork Chops", price: 110, unit: "kg" },
-  { name: "Mixed Cut Beef (Stew Cuts)", price: 120, unit: "kg" },
-  { name: "Steak & Steak on Bone", price: 130, unit: "kg" },
-  { name: "Lamb", price: 100, unit: "kg" },
-  { name: "Goat Meat", price: 100, unit: "kg" },
-  { name: "Beef Offals", price: 80, unit: "kg" },
-  { name: "Goat Offals", price: 70, unit: "kg" },
-  { name: "Pork Trotters", price: 70, unit: "kg" },
-  { name: "Cow Trotters", price: null, unit: "piece", note: "Contact for pricing" },
-  { name: "Broiler Chicken (Dressed)", price: 150, unit: "whole" },
-  { name: "Village Chicken (Dressed)", price: 150, unit: "whole" },
-];
-
 const ProductsSection = () => {
+  const { vegetables, meat, loading, error } = useProducts();
   const generateWhatsAppMessage = (items: Array<{name: string, quantity?: number}>) => {
     const orderList = items.map(item => {
       const qty = item.quantity || 1;
@@ -70,30 +44,57 @@ const ProductsSection = () => {
           </div>
           
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {vegetables.map((veg) => (
-              <div
-                key={veg.name}
-                className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow"
-              >
-                <div className="flex justify-between items-start mb-2">
-                  <h4 className="font-semibold text-foreground">{veg.name}</h4>
-                  <span className="text-xs text-muted-foreground bg-gray-100 px-2 py-1 rounded">
-                    {veg.unit}
-                  </span>
-                </div>
-                <div className="text-lg font-bold text-farm-leaf mb-3">
-                  {veg.price ? `K${veg.price}` : veg.note || 'Market Price'}
-                </div>
-                <a
-                  href={`${WHATSAPP_LINK}?text=${encodeURIComponent(generateWhatsAppMessage([{name: veg.name}]))}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full bg-farm-leaf text-white text-sm font-medium py-2 rounded hover:bg-farm-forest transition-colors text-center"
-                >
-                  Order via WhatsApp
-                </a>
+            {loading ? (
+              <div className="col-span-full text-center py-8">
+                <div className="inline-flex items-center justify-center w-8 h-8 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
+                <p className="mt-2 text-gray-600">Loading products...</p>
               </div>
-            ))}
+            ) : error ? (
+              <div className="col-span-full text-center py-8">
+                <p className="text-red-600 font-medium">{error}</p>
+              </div>
+            ) : vegetables.length > 0 ? (
+              vegetables.map((veg) => (
+                <div
+                  key={veg.id}
+                  className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow"
+                >
+                  <div className="flex justify-between items-start mb-2">
+                    <h4 className="font-semibold text-foreground">{veg.name}</h4>
+                    <span className="text-xs text-muted-foreground bg-gray-100 px-2 py-1 rounded">
+                      {veg.unit}
+                    </span>
+                  </div>
+                  <div className="aspect-square mb-3 rounded-lg overflow-hidden">
+                    <img
+                      src={veg.image_url || "/placeholder.svg"}
+                      alt={veg.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = "/placeholder.svg";
+                      }}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
+                  <div className="text-lg font-bold text-farm-leaf mb-3">
+                    {veg.price ? `K${veg.price}` : veg.market_note || 'Market Price'}
+                  </div>
+                  <a
+                    href={`${WHATSAPP_LINK}?text=${encodeURIComponent(generateWhatsAppMessage([{name: veg.name}]))}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full bg-farm-leaf text-white text-sm font-medium py-2 rounded hover:bg-farm-forest transition-colors text-center"
+                  >
+                    Order via WhatsApp
+                  </a>
+                </div>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-8">
+                <p className="text-gray-600">No vegetables available</p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -110,30 +111,57 @@ const ProductsSection = () => {
           </div>
           
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {meat.map((item) => (
-              <div
-                key={item.name}
-                className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow"
-              >
-                <div className="flex justify-between items-start mb-2">
-                  <h4 className="font-semibold text-foreground">{item.name}</h4>
-                  <span className="text-xs text-muted-foreground bg-gray-100 px-2 py-1 rounded">
-                    {item.unit}
-                  </span>
-                </div>
-                <div className="text-lg font-bold text-farm-leaf mb-3">
-                  {item.price ? `K${item.price}` : item.note || 'Contact for pricing'}
-                </div>
-                <a
-                  href={`${WHATSAPP_LINK}?text=${encodeURIComponent(generateWhatsAppMessage([{name: item.name}]))}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full bg-farm-leaf text-white text-sm font-medium py-2 rounded hover:bg-farm-forest transition-colors text-center"
-                >
-                  Order via WhatsApp
-                </a>
+            {loading ? (
+              <div className="col-span-full text-center py-8">
+                <div className="inline-flex items-center justify-center w-8 h-8 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
+                <p className="mt-2 text-gray-600">Loading products...</p>
               </div>
-            ))}
+            ) : error ? (
+              <div className="col-span-full text-center py-8">
+                <p className="text-red-600 font-medium">{error}</p>
+              </div>
+            ) : meat.length > 0 ? (
+              meat.map((item) => (
+                <div
+                  key={item.id}
+                  className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow"
+                >
+                  <div className="flex justify-between items-start mb-2">
+                    <h4 className="font-semibold text-foreground">{item.name}</h4>
+                    <span className="text-xs text-muted-foreground bg-gray-100 px-2 py-1 rounded">
+                      {item.unit}
+                    </span>
+                  </div>
+                  <div className="aspect-square mb-3 rounded-lg overflow-hidden">
+                    <img
+                      src={item.image_url || "/placeholder.svg"}
+                      alt={item.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = "/placeholder.svg";
+                      }}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
+                  <div className="text-lg font-bold text-farm-leaf mb-3">
+                    {item.price ? `K${item.price}` : item.market_note || 'Contact for pricing'}
+                  </div>
+                  <a
+                    href={`${WHATSAPP_LINK}?text=${encodeURIComponent(generateWhatsAppMessage([{name: item.name}]))}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full bg-farm-leaf text-white text-sm font-medium py-2 rounded hover:bg-farm-forest transition-colors text-center"
+                  >
+                    Order via WhatsApp
+                  </a>
+                </div>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-8">
+                <p className="text-gray-600">No meat products available</p>
+              </div>
+            )}
           </div>
         </div>
 

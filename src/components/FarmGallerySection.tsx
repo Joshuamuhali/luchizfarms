@@ -1,141 +1,79 @@
-import { useState } from "react";
-import { Camera, Heart, Sprout, TreePine, Sun, Wind, Droplets, Wheat } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Camera, Sprout, Sun, Wind, Droplets, Wheat, Heart } from "lucide-react";
+import { useProducts } from "@/hooks/useProducts";
 
-// Helper function to get image paths
-const getImagePath = (filename: string) => `/assets/farm-photos/${filename}`;
+const PLACEHOLDER_IMAGE = "https://drive.google.com/uc?export=view&id=REPLACE_ME";
+
+interface GalleryImage {
+  id: string;
+  url: string;
+  productName: string;
+  productId: string;
+}
 
 const FarmGallerySection = () => {
-  const [selectedImage, setSelectedImage] = useState<number | null>(null);
+  const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
+  const { products, loading, error } = useProducts();
 
-  // Use ALL the farm photos from 3u Export Photos
-  const galleryImages = [
-    {
-      id: 1,
-      src: getImagePath("Chibwabwa.JPG"),
-      alt: "Fresh Chibwabwa vegetables from our farm",
-      category: "Vegetables",
-      icon: Sprout
-    },
-    {
-      id: 2,
-      src: getImagePath("ChineseCabbage.JPG"),
-      alt: "Chinese Cabbage grown in our fertile soil",
-      category: "Vegetables",
-      icon: Sprout
-    },
-    {
-      id: 3,
-      src: getImagePath("cabbage.JPG"),
-      alt: "Fresh cabbage harvested from our fields",
-      category: "Vegetables",
-      icon: Sprout
-    },
-    {
-      id: 4,
-      src: getImagePath("Lumanda.JPG"),
-      alt: "Lumanda leaves ready for harvest",
-      category: "Vegetables",
-      icon: Sprout
-    },
-    {
-      id: 5,
-      src: getImagePath("Okra.JPG"),
-      alt: "Fresh Okra pods from our garden",
-      category: "Vegetables",
-      icon: Sprout
-    },
-    {
-      id: 6,
-      src: getImagePath("Onions.JPG"),
-      alt: "Onions cultivated at Luchiz Farm",
-      category: "Vegetables",
-      icon: Sprout
-    },
-    {
-      id: 7,
-      src: getImagePath("Tomatoes.JPG"),
-      alt: "Ripe tomatoes from our farm",
-      category: "Vegetables",
-      icon: Sprout
-    },
-    {
-      id: 8,
-      src: getImagePath("pepper.JPG"),
-      alt: "Colorful peppers grown on our farm",
-      category: "Vegetables",
-      icon: Sprout
-    },
-    {
-      id: 9,
-      src: getImagePath("Pork Chops.JPG"),
-      alt: "Quality pork products from our livestock",
-      category: "Meat",
-      icon: Heart
-    },
-    {
-      id: 10,
-      src: getImagePath("Goat Meat.JPG"),
-      alt: "Fresh goat meat from our farm",
-      category: "Meat",
-      icon: Heart
-    },
-    {
-      id: 11,
-      src: getImagePath("IMG_3844.JPG"),
-      alt: "Farm operations at Luchiz Farm",
-      category: "Farm Life",
-      icon: TreePine
-    },
-    {
-      id: 12,
-      src: getImagePath("IMG_3849.JPG"),
-      alt: "Daily activities on our farm",
-      category: "Farm Life",
-      icon: TreePine
-    },
-    {
-      id: 13,
-      src: getImagePath("IMG_3852.JPG"),
-      alt: "Scenes from Luchiz Farm",
-      category: "Farm Life",
-      icon: TreePine
-    },
-    {
-      id: 14,
-      src: getImagePath("IMG_3853.JPG"),
-      alt: "Our farming environment",
-      category: "Farm Life",
-      icon: TreePine
-    },
-    {
-      id: 15,
-      src: getImagePath("IMG_3856.JPG"),
-      alt: "Life at Luchiz Farm",
-      category: "Farm Life",
-      icon: TreePine
-    },
-    {
-      id: 16,
-      src: getImagePath("IMG_3867.PNG"),
-      alt: "Beautiful farm landscape at Luchiz Farm",
-      category: "Farm Life",
-      icon: TreePine
-    },
-    {
-      id: 17,
-      src: getImagePath("IMG_3868.PNG"),
-      alt: "Scenic views from our farm in Chisamba",
-      category: "Farm Life",
-      icon: TreePine
-    },
-    {
-      id: 18,
-      src: getImagePath("IMG_3869.JPG"),
-      alt: "Agricultural operations at Luchiz Farm",
-      category: "Farm Life",
-      icon: TreePine
-    }
-  ];
+  useEffect(() => {
+    // Show 6 images: 4 user-provided + 2 additional
+    const galleryImages: GalleryImage[] = [
+      {
+        id: 'lamb',
+        url: 'https://xmaawnzzlnpbtfxzsduj.supabase.co/storage/v1/object/public/products/IMG_3853.JPG',
+        productName: 'Lamb',
+        productId: 'lamb'
+      },
+      {
+        id: 'beef-offals',
+        url: 'https://xmaawnzzlnpbtfxzsduj.supabase.co/storage/v1/object/public/products/IMG_3856.JPG',
+        productName: 'Beef Offals',
+        productId: 'beef-offals'
+      },
+      {
+        id: 'village-chicken',
+        url: 'https://xmaawnzzlnpbtfxzsduj.supabase.co/storage/v1/object/public/products/IMG_3868.PNG',
+        productName: 'Village Chicken (Dressed)',
+        productId: 'village-chicken'
+      },
+      {
+        id: 'impwa',
+        url: 'https://xmaawnzzlnpbtfxzsduj.supabase.co/storage/v1/object/public/products/impwa.jpg',
+        productName: 'Impwa',
+        productId: 'impwa'
+      },
+      {
+        id: 'okra',
+        url: 'https://xmaawnzzlnpbtfxzsduj.supabase.co/storage/v1/object/public/products/IMG_3856.JPG',
+        productName: 'Okra',
+        productId: 'okra'
+      },
+      {
+        id: 'chibwabwa',
+        url: 'https://xmaawnzzlnpbtfxzsduj.supabase.co/storage/v1/object/public/products/IMG_3869.JPG',
+        productName: 'Chibwabwa',
+        productId: 'chibwabwa'
+      },
+      {
+        id: 'tomatoes',
+        url: 'https://xmaawnzzlnpbtfxzsduj.supabase.co/storage/v1/object/public/products/IMG_3858.JPG',
+        productName: 'Tomatoes',
+        productId: 'tomatoes'
+      }
+    ];
+    
+    setGalleryImages(galleryImages);
+  }, []);
+
+  // Icon mapping
+  const getIcon = (iconName: string) => {
+    const icons: Record<string, any> = {
+      'Leaf': Sprout, 'Beef': Heart, 'UtensilsCrossed': Heart,
+      'Heart': Heart, 'Circle': Heart, 'Square': Heart, 'Bird': Heart, 'Drumstick': Heart
+    };
+    return icons[iconName] || Sprout;
+  };
 
   const farmFeatures = [
     { icon: Sun, text: "Sunny Location", description: "Perfect growing conditions" },
@@ -180,35 +118,57 @@ const FarmGallerySection = () => {
 
         {/* Gallery Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          {galleryImages.map((image) => (
-            <div
-              key={image.id}
-              className="group relative overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 cursor-pointer"
-              onClick={() => setSelectedImage(image.id)}
-            >
-              <div className="aspect-square">
-                <img
-                  src={image.src}
-                  alt={image.alt}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          {loading ? (
+            // Loading state
+            Array.from({ length: 6 }).map((_, index) => (
+              <div key={`loading-${index}`} className="group relative overflow-hidden rounded-2xl bg-white shadow-lg">
+                <div className="aspect-square bg-gray-200 animate-pulse"></div>
               </div>
-              
-              {/* Category Badge */}
-              <div className="absolute top-4 left-4">
-                <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 shadow-lg">
-                  <image.icon className="w-4 h-4 text-farm-leaf" />
-                  <span className="text-xs font-medium text-foreground">{image.category}</span>
+            ))
+          ) : error ? (
+            // Error state
+            <div className="col-span-full text-center py-12">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
+                <span className="text-red-500 text-2xl">!</span>
+              </div>
+              <p className="text-red-600 font-medium">{error}</p>
+            </div>
+          ) : galleryImages.length > 0 ? (
+            galleryImages.map((image) => (
+              <div
+                key={image.id}
+                className="group relative overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 cursor-pointer"
+                onClick={() => setSelectedImage(image)}
+              >
+                <div className="aspect-square">
+                  <img
+                    src={image.url || PLACEHOLDER_IMAGE}
+                    alt={image.productName}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </div>
+                
+                {/* Category Badge */}
+                <div className="absolute top-4 left-4">
+                  <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 shadow-lg">
+                    <Sprout className="w-4 h-4 text-farm-leaf" />
+                    <span className="text-xs font-medium text-foreground">Luchiz Farm</span>
+                  </div>
+                </div>
+
+                {/* Hover Info */}
+                <div className="absolute bottom-0 left-0 right-0 p-6 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                  <p className="text-white font-medium text-sm">{image.productName}</p>
                 </div>
               </div>
-
-              {/* Hover Info */}
-              <div className="absolute bottom-0 left-0 right-0 p-6 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                <p className="text-white font-medium text-sm">{image.alt}</p>
-              </div>
+            ))
+          ) : (
+            // Empty state
+            <div className="col-span-full text-center py-12">
+              <p className="text-muted-foreground">No gallery images available yet.</p>
             </div>
-          ))}
+          )}
         </div>
 
         {/* Call to Action */}
@@ -247,8 +207,8 @@ const FarmGallerySection = () => {
         >
           <div className="relative max-w-4xl max-h-[90vh]">
             <img
-              src={galleryImages.find(img => img.id === selectedImage)?.src}
-              alt={galleryImages.find(img => img.id === selectedImage)?.alt}
+              src={selectedImage.url || PLACEHOLDER_IMAGE}
+              alt={selectedImage.productName}
               className="w-full h-full object-contain rounded-2xl"
             />
             <button
