@@ -1,6 +1,6 @@
 import { MapPin, Home, Flag } from "lucide-react";
 
-const FARMER_IMAGE_URL = "https://twybuesrupusogzoszqf.supabase.co/storage/v1/object/public/gallery/boss%20image.jpg";
+const FARMER_IMAGE_URL = "https://twybuesrupusogzoszqf.supabase.co/storage/v1/object/public/gallery/boss%20.jpg";
 
 const AboutSection = () => {
   return (

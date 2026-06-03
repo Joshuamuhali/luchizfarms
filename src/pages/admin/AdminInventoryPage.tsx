@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AdminLayout from "@/components/AdminLayout";
 import { DataService, type Product } from "@/lib/data-service";
@@ -20,32 +20,43 @@ interface EditRow {
   is_active: boolean;
 }
 
+// Build a canonical key for comparing against original values
+function rowKey(row: EditRow) {
+  return JSON.stringify(row);
+}
+
+function buildInitial(products: Product[]): Record<string, EditRow> {
+  const map: Record<string, EditRow> = {};
+  products.forEach((p) => {
+    map[p.id] = {
+      price: p.price != null ? String(p.price) : "",
+      stock_quantity: String(p.stock_quantity),
+      low_stock_threshold: String(p.low_stock_threshold),
+      is_market_price: p.is_market_price,
+      market_note: p.market_note ?? "",
+      is_active: p.is_active,
+    };
+  });
+  return map;
+}
+
 function AdminInventoryContent() {
   const { toast } = useToast();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [edits, setEdits] = useState<Record<string, EditRow>>({});
-  const [saving, setSaving] = useState<string | null>(null);
+  const [original, setOriginal] = useState<Record<string, EditRow>>({});
+  const [saving, setSaving] = useState(false);
   const [filterCat, setFilterCat] = useState<string>("all");
 
-  const load = () => {
+  const load = useCallback(() => {
     setLoading(true);
     DataService.getAllProducts()
       .then((data) => {
         setProducts(data);
-        // Initialise edit state from fetched data
-        const initial: Record<string, EditRow> = {};
-        data.forEach((p) => {
-          initial[p.id] = {
-            price: p.price != null ? String(p.price) : "",
-            stock_quantity: String(p.stock_quantity),
-            low_stock_threshold: String(p.low_stock_threshold),
-            is_market_price: p.is_market_price,
-            market_note: p.market_note ?? "",
-            is_active: p.is_active,
-          };
-        });
-        setEdits(initial);
+        const init = buildInitial(data);
+        setEdits(init);
+        setOriginal(init);
       })
       .catch((e) =>
         toast({
@@ -55,9 +66,9 @@ function AdminInventoryContent() {
         })
       )
       .finally(() => setLoading(false));
-  };
+  }, []);
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [load]);
 
   const patch = (id: string, field: keyof EditRow, value: string | boolean) => {
     setEdits((prev) => ({
@@ -66,34 +77,53 @@ function AdminInventoryContent() {
     }));
   };
 
-  const save = async (product: Product) => {
-    const row = edits[product.id];
-    if (!row) return;
-    setSaving(product.id);
+  // Which product IDs have unsaved changes
+  const dirtyIds = products
+    .map((p) => p.id)
+    .filter((id) => edits[id] && original[id] && rowKey(edits[id]) !== rowKey(original[id]));
+
+  const saveAll = async () => {
+    if (dirtyIds.length === 0) {
+      toast({ title: "Nothing to save", description: "No changes detected." });
+      return;
+    }
+    setSaving(true);
     try {
-      await DataService.updateProduct(product.id, {
-        price: row.is_market_price ? null : row.price !== "" ? Number(row.price) : null,
-        stock_quantity: parseInt(row.stock_quantity) || 0,
-        low_stock_threshold: parseInt(row.low_stock_threshold) || 5,
-        is_market_price: row.is_market_price,
-        market_note: row.market_note || undefined,
-        is_active: row.is_active,
+      await Promise.all(
+        dirtyIds.map((id) => {
+          const row = edits[id];
+          return DataService.updateProduct(id, {
+            price: row.is_market_price ? null : row.price !== "" ? Number(row.price) : null,
+            stock_quantity: parseInt(row.stock_quantity) || 0,
+            low_stock_threshold: parseInt(row.low_stock_threshold) || 5,
+            is_market_price: row.is_market_price,
+            market_note: row.market_note || undefined,
+            is_active: row.is_active,
+          });
+        })
+      );
+      toast({
+        title: `${dirtyIds.length} product${dirtyIds.length > 1 ? "s" : ""} saved`,
+        description: "All changes have been applied.",
       });
-      toast({ title: `${product.name} updated` });
-      load();
+      load(); // refresh to sync original state
     } catch (e) {
       toast({
         title: "Save failed",
-        description: e instanceof Error ? e.message : undefined,
+        description: e instanceof Error ? e.message : "Some products may not have saved.",
         variant: "destructive",
       });
     } finally {
-      setSaving(null);
+      setSaving(false);
     }
   };
 
-  const cats = Array.from(new Set(products.map((p) => p.category?.name ?? "Other")));
+  const discardAll = () => {
+    setEdits(original);
+    toast({ title: "Changes discarded" });
+  };
 
+  const cats = Array.from(new Set(products.map((p) => p.category?.name ?? "Other")));
   const filtered =
     filterCat === "all"
       ? products
@@ -106,30 +136,70 @@ function AdminInventoryContent() {
 
   return (
     <div className="p-8">
-      <div className="flex items-center justify-between mb-6">
+      {/* Header */}
+      <div className="flex items-start justify-between mb-6 gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Inventory</h1>
           <p className="text-muted-foreground text-sm mt-1">
-            Set prices, update stock, and toggle product visibility.
+            Edit any fields below, then hit <strong>Save all changes</strong> once.
           </p>
         </div>
-        <Button variant="outline" onClick={load} className="gap-2">
-          <RefreshCw className="w-4 h-4" />
-          Refresh
-        </Button>
+        <div className="flex items-center gap-2 shrink-0">
+          <Button
+            variant="outline"
+            onClick={load}
+            disabled={loading || saving}
+            className="gap-2 h-10"
+          >
+            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+            Refresh
+          </Button>
+          {dirtyIds.length > 0 && (
+            <Button
+              variant="ghost"
+              onClick={discardAll}
+              disabled={saving}
+              className="h-10 text-muted-foreground hover:text-red-600"
+            >
+              Discard
+            </Button>
+          )}
+          <Button
+            onClick={saveAll}
+            disabled={saving || dirtyIds.length === 0}
+            className="gap-2 h-10 bg-farm-leaf hover:bg-farm-forest text-white px-5"
+          >
+            <Save className="w-4 h-4" />
+            {saving
+              ? "Saving…"
+              : dirtyIds.length > 0
+              ? `Save all changes (${dirtyIds.length})`
+              : "Save all changes"}
+          </Button>
+        </div>
       </div>
 
-      {/* Alerts */}
+      {/* Unsaved changes banner */}
+      {dirtyIds.length > 0 && !saving && (
+        <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-5 text-sm text-amber-800">
+          <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
+          <span>
+            You have unsaved changes on{" "}
+            <strong>{dirtyIds.length} product{dirtyIds.length > 1 ? "s" : ""}</strong>.
+            Click <strong>Save all changes</strong> to apply them.
+          </span>
+        </div>
+      )}
+
+      {/* Stock alerts */}
       {(outOfStock.length > 0 || lowStock.length > 0) && (
-        <div className="grid sm:grid-cols-2 gap-3 mb-6">
+        <div className="grid sm:grid-cols-2 gap-3 mb-5">
           {outOfStock.length > 0 && (
             <div className="flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl p-4">
               <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold text-red-700 text-sm">Out of stock ({outOfStock.length})</p>
-                <p className="text-xs text-red-600 mt-0.5">
-                  {outOfStock.map((p) => p.name).join(", ")}
-                </p>
+                <p className="text-xs text-red-600 mt-0.5">{outOfStock.map((p) => p.name).join(", ")}</p>
               </div>
             </div>
           )}
@@ -138,9 +208,7 @@ function AdminInventoryContent() {
               <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold text-amber-700 text-sm">Low stock ({lowStock.length})</p>
-                <p className="text-xs text-amber-600 mt-0.5">
-                  {lowStock.map((p) => p.name).join(", ")}
-                </p>
+                <p className="text-xs text-amber-600 mt-0.5">{lowStock.map((p) => p.name).join(", ")}</p>
               </div>
             </div>
           )}
@@ -159,7 +227,7 @@ function AdminInventoryContent() {
                 : "bg-gray-100 text-gray-600 hover:bg-gray-200"
             }`}
           >
-            {c === "all" ? "All products" : c}
+            {c === "all" ? `All products (${products.length})` : c}
           </button>
         ))}
       </div>
@@ -177,24 +245,29 @@ function AdminInventoryContent() {
                 <TableHead>Category</TableHead>
                 <TableHead>Price (K)</TableHead>
                 <TableHead>Market price?</TableHead>
-                <TableHead>Stock</TableHead>
+                <TableHead>Stock qty</TableHead>
                 <TableHead>Low stock at</TableHead>
-                <TableHead>Active</TableHead>
-                <TableHead>Save</TableHead>
+                <TableHead>Visibility</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filtered.map((product) => {
                 const row = edits[product.id];
                 if (!row) return null;
+                const isDirty =
+                  original[product.id] &&
+                  rowKey(row) !== rowKey(original[product.id]);
                 const isLow =
                   product.stock_quantity > 0 &&
                   product.stock_quantity <= product.low_stock_threshold;
                 const isOut = product.stock_quantity === 0;
+
                 return (
                   <TableRow
                     key={product.id}
-                    className={`${!row.is_active ? "opacity-50" : ""} hover:bg-gray-50`}
+                    className={`transition-colors ${
+                      !row.is_active ? "opacity-50" : ""
+                    } ${isDirty ? "bg-amber-50/40" : "hover:bg-gray-50"}`}
                   >
                     <TableCell>
                       <div className="flex items-center gap-2">
@@ -202,13 +275,18 @@ function AdminInventoryContent() {
                           <img
                             src={product.image_url}
                             alt={product.name}
-                            className="w-8 h-8 rounded-lg object-cover shrink-0"
+                            className="w-9 h-9 rounded-lg object-cover shrink-0"
                           />
                         ) : (
-                          <div className="w-8 h-8 rounded-lg bg-gray-100 shrink-0" />
+                          <div className="w-9 h-9 rounded-lg bg-gray-100 shrink-0" />
                         )}
                         <div>
-                          <p className="font-medium text-sm">{product.name}</p>
+                          <div className="flex items-center gap-1.5">
+                            <p className="font-medium text-sm">{product.name}</p>
+                            {isDirty && (
+                              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" title="Unsaved changes" />
+                            )}
+                          </div>
                           <p className="text-xs text-muted-foreground">{product.unit}</p>
                         </div>
                       </div>
@@ -228,7 +306,7 @@ function AdminInventoryContent() {
                       />
                     </TableCell>
                     <TableCell>
-                      <label className="flex items-center gap-1.5 cursor-pointer">
+                      <label className="flex items-center gap-1.5 cursor-pointer select-none">
                         <input
                           type="checkbox"
                           checked={row.is_market_price}
@@ -246,19 +324,11 @@ function AdminInventoryContent() {
                           value={row.stock_quantity}
                           onChange={(e) => patch(product.id, "stock_quantity", e.target.value)}
                           className={`w-20 h-8 text-sm ${
-                            isOut
-                              ? "border-red-300 focus:border-red-400"
-                              : isLow
-                              ? "border-amber-300 focus:border-amber-400"
-                              : ""
+                            isOut ? "border-red-300" : isLow ? "border-amber-300" : ""
                           }`}
                         />
-                        {isOut && (
-                          <span className="text-xs font-medium text-red-500">Out</span>
-                        )}
-                        {isLow && !isOut && (
-                          <span className="text-xs font-medium text-amber-500">Low</span>
-                        )}
+                        {isOut && <span className="text-xs font-medium text-red-500">Out</span>}
+                        {isLow && !isOut && <span className="text-xs font-medium text-amber-500">Low</span>}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -273,35 +343,51 @@ function AdminInventoryContent() {
                     <TableCell>
                       <button
                         onClick={() => patch(product.id, "is_active", !row.is_active)}
-                        className={`flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-lg transition-colors ${
+                        className={`flex items-center gap-1 text-xs font-medium px-2.5 py-1.5 rounded-lg transition-colors ${
                           row.is_active
                             ? "bg-green-50 text-green-700 hover:bg-green-100"
                             : "bg-gray-100 text-gray-500 hover:bg-gray-200"
                         }`}
                       >
-                        {row.is_active ? (
-                          <><Eye className="w-3.5 h-3.5" /> Visible</>
-                        ) : (
-                          <><EyeOff className="w-3.5 h-3.5" /> Hidden</>
-                        )}
+                        {row.is_active
+                          ? <><Eye className="w-3.5 h-3.5" /> Visible</>
+                          : <><EyeOff className="w-3.5 h-3.5" /> Hidden</>}
                       </button>
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        size="sm"
-                        onClick={() => save(product)}
-                        disabled={saving === product.id}
-                        className="h-8 text-xs gap-1 bg-farm-leaf hover:bg-farm-forest text-white"
-                      >
-                        <Save className="w-3.5 h-3.5" />
-                        {saving === product.id ? "…" : "Save"}
-                      </Button>
                     </TableCell>
                   </TableRow>
                 );
               })}
             </TableBody>
           </Table>
+
+          {/* Sticky bottom save bar */}
+          {dirtyIds.length > 0 && (
+            <div className="sticky bottom-0 border-t border-amber-200 bg-amber-50 px-6 py-3 flex items-center justify-between gap-4">
+              <p className="text-sm text-amber-800 font-medium">
+                {dirtyIds.length} unsaved change{dirtyIds.length > 1 ? "s" : ""}
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={discardAll}
+                  disabled={saving}
+                  className="text-amber-700 hover:text-red-700 hover:bg-red-50"
+                >
+                  Discard all
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={saveAll}
+                  disabled={saving}
+                  className="bg-farm-leaf hover:bg-farm-forest text-white gap-1.5"
+                >
+                  <Save className="w-3.5 h-3.5" />
+                  {saving ? "Saving…" : `Save all (${dirtyIds.length})`}
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
