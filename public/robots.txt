@@ -1,5 +1,5 @@
 # Luchiz Farm – robots.txt
-# https://luchizfarms.com
+# https://luchizfarms.vercel.app
 
 # ── Standard search engines ──────────────────────────────────────────
 User-agent: Googlebot
@@ -85,4 +85,4 @@ Disallow: /admin/
 Disallow: /account/
 
 # ── Sitemap ───────────────────────────────────────────────────────────
-Sitemap: https://luchizfarms.com/sitemap.xml
+Sitemap: https://luchizfarms.vercel.app/sitemap.xml

@@ -3,42 +3,42 @@
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
   <url>
-    <loc>https://luchizfarms.com/</loc>
+    <loc>https://luchizfarms.vercel.app/</loc>
     <lastmod>2026-06-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
   <url>
-    <loc>https://luchizfarms.com/about</loc>
+    <loc>https://luchizfarms.vercel.app/about</loc>
     <lastmod>2026-06-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://luchizfarms.com/order</loc>
+    <loc>https://luchizfarms.vercel.app/order</loc>
     <lastmod>2026-06-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://luchizfarms.com/gallery</loc>
+    <loc>https://luchizfarms.vercel.app/gallery</loc>
     <lastmod>2026-06-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://luchizfarms.com/how-to-order</loc>
+    <loc>https://luchizfarms.vercel.app/how-to-order</loc>
     <lastmod>2026-06-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://luchizfarms.com/contact</loc>
+    <loc>https://luchizfarms.vercel.app/contact</loc>
     <lastmod>2026-06-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
