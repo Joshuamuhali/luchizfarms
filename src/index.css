@@ -1,0 +1,194 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Balanced Modern Farm Color Palette */
+    --background: 0 0% 98%;
+    --foreground: 30 15% 20%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 30 15% 20%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 30 15% 20%;
+
+    --primary: 142 60% 35%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 45 70% 55%;
+    --secondary-foreground: 30 15% 20%;
+
+    --muted: 30 8% 95%;
+    --muted-foreground: 30 8% 50%;
+
+    --accent: 142 60% 35%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 70% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 30 8% 90%;
+    --input: 30 8% 90%;
+    --ring: 142 60% 35%;
+
+    --radius: 0.75rem;
+
+    /* Professional Farm Theme Colors */
+    --farm-soil: 25 35% 30%;
+    --farm-sunshine: 45 70% 55%;
+    --farm-leaf: 142 60% 35%;
+    --farm-sky: 200 60% 95%;
+    --farm-cloud: 0 0% 100%;
+    --farm-wheat: 35 75% 60%;
+    --farm-forest: 142 45% 30%;
+  }
+
+  .dark {
+    --background: 20 15% 8%;
+    --foreground: 20 10% 95%;
+    --card: 20 15% 12%;
+    --card-foreground: 20 10% 95%;
+    --popover: 20 15% 12%;
+    --popover-foreground: 20 10% 95%;
+    --primary: 142 70% 55%;
+    --primary-foreground: 20 15% 8%;
+    --secondary: 45 100% 52%;
+    --secondary-foreground: 20 15% 8%;
+    --muted: 20 10% 18%;
+    --muted-foreground: 20 10% 65%;
+    --accent: 142 70% 55%;
+    --accent-foreground: 20 15% 8%;
+    --destructive: 0 62% 55%;
+    --destructive-foreground: 20 10% 95%;
+    --border: 20 10% 22%;
+    --input: 20 10% 22%;
+    --ring: 142 70% 55%;
+    
+    --farm-soil: 25 40% 55%;
+    --farm-sunshine: 45 100% 52%;
+    --farm-leaf: 142 70% 55%;
+    --farm-sky: 200 80% 25%;
+    --farm-cloud: 20 15% 12%;
+    --farm-wheat: 35 85% 55%;
+    --farm-forest: 142 50% 45%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', sans-serif;
+    @apply font-semibold;
+  }
+}
+
+@layer utilities {
+  .text-gradient-farm {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, hsl(var(--farm-leaf)), hsl(var(--farm-sunshine)));
+  }
+  
+  .text-gradient-sunshine {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, hsl(var(--farm-sunshine)), hsl(var(--farm-wheat)));
+  }
+  
+  .bg-farm-gradient {
+    background: linear-gradient(135deg, hsl(var(--farm-sky)), hsl(var(--farm-cloud)));
+  }
+  
+  .bg-farm-card {
+    background: linear-gradient(135deg, hsl(var(--card)), hsl(var(--farm-cloud)));
+  }
+  
+  .shadow-farm {
+    box-shadow: 0 4px 20px -2px hsl(var(--farm-soil) / 0.15);
+  }
+  
+  .shadow-farm-lg {
+    box-shadow: 0 10px 40px -4px hsl(var(--farm-soil) / 0.2);
+  }
+  
+  .border-farm {
+    border: 1px solid hsl(var(--farm-soil) / 0.1);
+  }
+  
+  .btn-farm {
+    background-color: hsl(var(--farm-leaf));
+    color: white;
+    font-weight: 600;
+    border-radius: 0.75rem;
+    padding: 0.875rem 1.5rem;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px hsl(var(--farm-leaf) / 0.3);
+    border: 1px solid hsl(var(--farm-leaf));
+  }
+  
+  .btn-farm:hover {
+    background-color: hsl(var(--farm-forest));
+    box-shadow: 0 4px 12px hsl(var(--farm-forest) / 0.4);
+    transform: translateY(-1px);
+  }
+  
+  .btn-farm:active {
+    transform: translateY(0);
+  }
+  
+  .btn-sunshine {
+    background-color: hsl(var(--farm-sunshine));
+    color: hsl(var(--farm-soil));
+    font-weight: 600;
+    border-radius: 0.75rem;
+    padding: 0.875rem 1.5rem;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px hsl(var(--farm-sunshine) / 0.3);
+    border: 1px solid hsl(var(--farm-wheat));
+  }
+  
+  .btn-sunshine:hover {
+    background-color: hsl(var(--farm-wheat));
+    box-shadow: 0 4px 12px hsl(var(--farm-wheat) / 0.4);
+    transform: translateY(-1px);
+  }
+  
+  .btn-sunshine:active {
+    transform: translateY(0);
+  }
+
+  /* Farm color utility classes */
+  .bg-farm-soil {
+    background-color: hsl(var(--farm-soil));
+  }
+  
+  .text-farm-soil {
+    color: hsl(var(--farm-soil));
+  }
+  
+  .bg-farm-sunshine {
+    background-color: hsl(var(--farm-sunshine));
+  }
+  
+  .text-farm-sunshine {
+    color: hsl(var(--farm-sunshine));
+  }
+  
+  .bg-farm-leaf {
+    background-color: hsl(var(--farm-leaf));
+  }
+  
+  .text-farm-leaf {
+    color: hsl(var(--farm-leaf));
+  }
+}
